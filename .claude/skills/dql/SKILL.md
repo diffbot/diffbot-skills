@@ -157,6 +157,7 @@ See [Facet Queries](https://docs.diffbot.com/docs/facet-queries.md) for full syn
 
 **Article**
  - `type:Article tags.label:"<entity name>"` refines an article query by mentioned entities. There is no exhaustive list of tag values — they are simply entity names that may or may not appear in the KG. If `tags.label` is too restrictive, fall back to `text:` matching.
+ - Unless otherwise stated, always end article queries with `sortBy:date`, which sorts the articles from newest to oldest.
 
 **Organization**
  - `categories.name` is usually an excellent starting point for crafting organization DQL
