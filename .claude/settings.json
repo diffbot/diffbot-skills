@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(.claude/skills/dql/scripts/dql:*)"
+      "Bash(~/.diffbot/venv/bin/db:*)",
+      "Bash(python3 -m venv ~/.diffbot/venv:*)",
+      "Bash(~/.diffbot/venv/bin/pip install:*)"
     ]
   }
 }

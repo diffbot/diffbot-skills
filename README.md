@@ -1,31 +1,28 @@
-# Diffbot DQL Skill
+# Diffbot Agent Skills
 
+A set of agent skills for fetching knowledge on the public web. Compatible with Claude Code and most harnesses.
+
+## List of Skills
+
+**/dql**
 A Claude Code skill for querying the [Diffbot Knowledge Graph](https://docs.diffbot.com/docs/getting-started-with-diffbot) using natural language. You describe what you're looking for; Claude constructs the DQL query and runs it.
 
 ## Dependencies
 
-- **`curl`** — pre-installed on macOS and most Linux distros
-- **`jq`** — JSON query tool used to inspect the ontology cache
-  - macOS Ventura+: ships with the OS. Otherwise: `brew install jq`
-  - Linux: `sudo apt install jq` / `sudo dnf install jq`
-  - Windows (WSL): `sudo apt install jq`
+- **`Python 3.10+`** - Python
+- **`diffbot-python`** - Diffbot Python Library
 
 ## Setup
 
-**1. Get your Diffbot API token** from https://app.diffbot.com/get-started/
+**1. Get a Diffbot API token** from https://app.diffbot.com/get-started/
 
-**2. Open this project in Claude Code** and run `/dql` once. The skill will create `~/.diffbot/` and cache the ontology automatically, then tell you credentials are missing.
-
-**3. Store your token:**
-
-```bash
-echo "token=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
-```
+**2. Open this project in your harness** and run any skill. 
 
 That's it. Run `/dql` again and it's ready.
 
 ## Usage
 
+### /dql
 Invoke with `/dql` followed by a plain-text description:
 
 ```
@@ -41,7 +38,7 @@ Claude will construct the DQL query, execute it against the Diffbot API, and ret
 ## Credentials file format
 
 ```
-token=YOUR_DIFFBOT_TOKEN_HERE
+DIFFBOT_API_TOKEN=YOUR_DIFFBOT_TOKEN_HERE
 ```
 
 The file lives at `~/.diffbot/credentials` on your local machine and is never part of this repository. The ontology cache at `~/.diffbot/ontology.json` is refreshed automatically each time the skill runs.

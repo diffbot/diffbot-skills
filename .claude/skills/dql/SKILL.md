@@ -1,49 +1,52 @@
 ---
 name: dql
 description: "Query the Diffbot Knowledge Graph using DQL (Diffbot Query Language). Use when the user wants to search for organizations, people, or articles in the Diffbot KG. Triggers on: search diffbot, query knowledge graph, dql search, find companies in diffbot, diffbot lookup, kg search."
-allowed-tools: Bash(.claude/skills/dql/scripts/dql:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---
 
 # Diffbot Knowledge Graph Search (DQL)
 
-Query the Diffbot Knowledge Graph via the DQL API. Translate the user's plain-text request into a DQL query, execute it through the `dql` CLI, and display formatted results.
+Query the Diffbot Knowledge Graph via the DQL API. Translate the user's plain-text request into a DQL query, execute it through the `db dql` CLI, and display formatted results.
 
-## The `dql` CLI
+## The `db dql` CLI
 
-All work in this skill is driven by one tool: `.claude/skills/dql/scripts/dql`. It is a small Python CLI that owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing — keeping the call site free of shell expansion (no `$`, no `~`, no `$(...)`, no pipes) so permissions stay clean and tool-call overhead stays minimal.
+All work in this skill is driven by the `db` CLI from the [`diffbot-python`](file://~/Diffbot/diffbot-python) library. It owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing.
 
-**Always invoke with the relative path `.claude/skills/dql/scripts/dql` from the project root.** Never use the absolute form (`/home/<user>/.../scripts/dql`) — the permission allow rule only matches the relative prefix, so absolute invocations will prompt. Throughout this document `dql` is shorthand for `.claude/skills/dql/scripts/dql`; expand it to the relative form in every actual bash command.
+**The skill runs the CLI from a dedicated virtualenv it owns at `~/.diffbot/venv`** — it does not assume `db` is on `PATH` or that any other venv exists. The Step 1 bootstrap creates the venv and installs the library if missing. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`** — never bare `db` and never another venv's `db`, so the permission allow rule matches and no `PATH` assumption is made. Throughout this document `db` is shorthand for `~/.diffbot/venv/bin/db`; expand it to the full path in every actual bash command.
 
 ```
-.claude/skills/dql/scripts/dql init                              # refresh ontology cache; check credentials
-.claude/skills/dql/scripts/dql ontology types
-.claude/skills/dql/scripts/dql ontology composites
-.claude/skills/dql/scripts/dql ontology enums
-.claude/skills/dql/scripts/dql ontology taxonomies
-.claude/skills/dql/scripts/dql ontology fields  <Type> [regex]   # entity-type or composite fields
-.claude/skills/dql/scripts/dql ontology taxonomy <Name> [regex]  # taxonomy values (recurses children)
-.claude/skills/dql/scripts/dql ontology enum    <Name>           # enum values
-.claude/skills/dql/scripts/dql ontology search  <regex>          # fallback: any 'name' anywhere in the ontology
-.claude/skills/dql/scripts/dql probe "<Q1>" "<Q2>" ...           # parallel hit counts for variants (size=0)
-.claude/skills/dql/scripts/dql export "<DQL>" <outfile> [--format csv|xls|xlsx|json] [--spec "name,Name;..."] [--size N] [--from K]
+~/.diffbot/venv/bin/db dql init                              # refresh ontology cache; check credentials
+~/.diffbot/venv/bin/db dql ontology types
+~/.diffbot/venv/bin/db dql ontology composites
+~/.diffbot/venv/bin/db dql ontology enums
+~/.diffbot/venv/bin/db dql ontology taxonomies
+~/.diffbot/venv/bin/db dql ontology fields  <Type> [regex]   # entity-type or composite fields
+~/.diffbot/venv/bin/db dql ontology taxonomy <Name> [regex]  # taxonomy values (recurses children)
+~/.diffbot/venv/bin/db dql ontology enum    <Name>           # enum values
+~/.diffbot/venv/bin/db dql ontology search  <regex>          # fallback: any 'name' anywhere in the ontology
+~/.diffbot/venv/bin/db dql probe "<Q1>" "<Q2>" ...           # parallel hit counts for variants (size=0)
+~/.diffbot/venv/bin/db dql export "<DQL>" --out <outfile> [--format csv|xls|xlsx|json] [--spec "name,Name;..."] [--size N] [--from K]
 ```
 
-`export` writes the API response straight to a file; all other commands write to stdout. Errors go to stderr with non-zero exit codes.
+`export --out <file>` writes the API response straight to a file; without `--out` it prints a formatted table to stdout. All other commands write to stdout. Errors go to stderr with non-zero exit codes.
 
-There is deliberately no "execute query and print JSON" command. Use `probe` to validate selectivity, then `export` to commit to the full payload — and only then. Pulling full data into the conversation for exploration burns tokens for no gain.
+Prefer `--out <file>` over stdout for anything but tiny result sets: use `probe` to validate selectivity, then `export --out` to commit the full payload to disk — and only then. Pulling full data into the conversation for exploration burns tokens for no gain.
 
 ## Workflow
 
-### Step 1 — `dql init`
+### Step 1 — bootstrap + `db dql init`
+
+First ensure the venv exists and the library is installed, then run `init`. Guard the venv creation so it only runs when the venv is missing — re-running `python3 -m venv` on an existing venv overwrites activation scripts and fails if any are read-only:
 
 ```
-.claude/skills/dql/scripts/dql init
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q -e ~/Diffbot/diffbot-python
+~/.diffbot/venv/bin/db dql init
 ```
 
-Refreshes `~/.diffbot/ontology.json`, resets `~/.diffbot/tmp/`, and verifies `~/.diffbot/credentials` exists. If credentials are missing the user must run:
+`init` refreshes `~/.diffbot/ontology.json`, resets `~/.diffbot/tmp/`, and verifies a token is available. The token is read from the `DIFFBOT_API_TOKEN` environment variable if set, otherwise from `~/.diffbot/credentials`. If neither is present the user must run:
 
 ```
-echo "token=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
+echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
 ```
 
 Tokens are available at https://app.diffbot.com/get-started/. The CLI loads the token itself — never echo it.
@@ -65,11 +68,11 @@ Every DQL string starts with `type:`. Start with common types (`Organization`, `
 **Look up fields before using them.** Independent ontology lookups should be issued as parallel Bash tool calls in a single Claude message so they don't queue.
 
 ```
-.claude/skills/dql/scripts/dql ontology fields Organization location     # entity-type fields, regex-filtered
-.claude/skills/dql/scripts/dql ontology fields Location                  # composite fields
-.claude/skills/dql/scripts/dql ontology taxonomy OrganizationCategory semiconductor
-.claude/skills/dql/scripts/dql ontology enum Language
-.claude/skills/dql/scripts/dql ontology search asset                     # fallback when you don't know where a field lives
+~/.diffbot/venv/bin/db dql ontology fields Organization location     # entity-type fields, regex-filtered
+~/.diffbot/venv/bin/db dql ontology fields Location                  # composite fields
+~/.diffbot/venv/bin/db dql ontology taxonomy OrganizationCategory semiconductor
+~/.diffbot/venv/bin/db dql ontology enum Language
+~/.diffbot/venv/bin/db dql ontology search asset                     # fallback when you don't know where a field lives
 ```
 
 `dql ontology fields` accepts both entity-type names (e.g. `Organization`) and composite names (e.g. `Location`, `Employment`) — it auto-routes. Output format: `<name>: [<type>] [isList] [isComposite] [isEnum]`.
@@ -124,6 +127,9 @@ Many entity types expose both a singular and plural form of the same composite f
 
 Prefer the singular form when you want to filter on the org's *primary* fact. Example: to find companies headquartered in the US, use `location.country.name:"United States"` — not `locations.country.name:"United States"`, which matches any org with a US office (even foreign-headquartered companies with a US branch). Using the singular field is also cleaner than a `locations.{country.name:"United States" isPrimary:true}` subquery.
 
+**regex operator**
+Regex is slow and compute heavy. Avoid if possible. If to be used, stick to short, simple, and speedy regex matches.
+
 **similarTo operator** _(Organization only)_
 
 ```
@@ -167,7 +173,7 @@ See [Facet Queries](https://docs.diffbot.com/docs/facet-queries.md) for full syn
 Before running the final query, probe candidate variants for hit counts to verify the query is well-shaped (not too broad, not too narrow). Use `dql probe` — it fires all variants concurrently:
 
 ```
-.claude/skills/dql/scripts/dql probe \
+~/.diffbot/venv/bin/db dql probe \
   'type:Organization descriptors:"GPU" location.country.name:"United States"' \
   'type:Organization descriptors:"GPU" location.country.name:"United States" categories.name:"Semiconductor Companies"' \
   'type:Organization descriptors:"GPU" location.country.name:"United States" isPublic:true'
@@ -180,7 +186,7 @@ Output is a sorted text table of hit counts; add `--json` for machine-readable. 
 Once `probe` confirms a query is well-shaped, commit to a CSV export. CSV is the canonical output format — it's compact, trivially turned into a markdown table, and avoids pulling the full entity payload into the conversation.
 
 ```
-.claude/skills/dql/scripts/dql export "<DQL>" /home/<user>/.diffbot/tmp/<filename>.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.csv \
   --spec "name,Name;nbEmployees,Employees;homepageUri,Website;location.city.name,City;location.region.name,State;isPublic,Public"
 ```
 
@@ -189,7 +195,7 @@ Once `probe` confirms a query is well-shaped, commit to a CSV export. CSV is the
 - Use lowercase field paths (`name`, not `Name`) — the first token is the actual DQL field path
 - For list/composite fields, only the primary value is rendered
 
-If a non-tabular shape is genuinely needed (e.g. inspecting one entity's full structure), use `.claude/skills/dql/scripts/dql export "<DQL>" /home/<user>/.diffbot/tmp/<filename>.json --format json --size 1` so the payload still lands in a file rather than the conversation.
+If a non-tabular shape is genuinely needed (e.g. inspecting one entity's full structure), use `~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.json --format json --size 1` so the payload still lands in a file rather than the conversation.
 
 **Final display**
 
