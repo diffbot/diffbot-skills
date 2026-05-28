@@ -1,6 +1,6 @@
 ---
 name: dql
-description: "Query the Diffbot Knowledge Graph using DQL (Diffbot Query Language). Use when the user wants to search for organizations, people, or articles in the Diffbot KG. Triggers on: search diffbot, query knowledge graph, dql search, find companies in diffbot, diffbot lookup, kg search."
+description: "Query the Diffbot Knowledge Graph using DQL (Diffbot Query Language). Use when the user wants to search for organizations, people, or articles in the Diffbot KG. Triggers on: search diffbot, query knowledge graph, dql search, find companies, find news articles, find people, latest news"
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---
 
@@ -162,6 +162,7 @@ See [Facet Queries](https://docs.diffbot.com/docs/facet-queries.md) for full syn
 #### Entity-Specific Tips
 
 **Article**
+ - `type:Article categories.name"<category name>"` is a great way to narrow down articles by topic. Use ontology taxonomy to look up the category names.
  - `type:Article tags.label:"<entity name>"` refines an article query by mentioned entities. There is no exhaustive list of tag values — they are simply entity names that may or may not appear in the KG. If `tags.label` is too restrictive, fall back to `text:` matching.
  - Unless otherwise stated, always end article queries with `sortBy:date`, which sorts the articles from newest to oldest.
 
@@ -183,25 +184,43 @@ Output is a sorted text table of hit counts; add `--json` for machine-readable. 
 
 ### Step 4 — Export and display
 
-Once `probe` confirms a query is well-shaped, commit to a CSV export. CSV is the canonical output format — it's compact, trivially turned into a markdown table, and avoids pulling the full entity payload into the conversation.
+**Choose format based on intent:**
+
+- **Further analysis** (piping to `jq`, passing text to the entities skill, feeding another tool): export as **JSON**.
+- **Final display to user** (markdown table, no downstream processing): export as **CSV**.
+
+**JSON export** (use when results will be piped or analyzed further):
+
+```
+~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.json --format json --size N
+```
+
+JSON payloads are easy to slice with `jq` before passing to other tools:
+
+```bash
+# To get all the keys available to you in the DQL export
+  jq '[.data[0].entity | path(..)] | map(join(".")) | unique' ~/.diffbot/tmp/<filename>.json
+```
+
+Refrain from reading `text` or `content` from type:Article DQL exports directly. `summary` may be more appropriate.
+
+**CSV export** (use when presenting a table directly to the user):
 
 ```
 ~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.csv \
   --spec "name,Name;nbEmployees,Employees;homepageUri,Website;location.city.name,City;location.region.name,State;isPublic,Public"
 ```
 
-`exportspec` notes:
+`--spec` notes:
 - Format is `<field-path>,<Display Name>` per pair, `;`-separated
 - Use lowercase field paths (`name`, not `Name`) — the first token is the actual DQL field path
 - For list/composite fields, only the primary value is rendered
-
-If a non-tabular shape is genuinely needed (e.g. inspecting one entity's full structure), use `~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.json --format json --size 1` so the payload still lands in a file rather than the conversation.
 
 **Final display**
 
 1. Always print the final DQL string in a plain code block so the user can copy/iterate.
 2. Tell the user the saved file path.
-3. Read the CSV and render it as a markdown table with columns appropriate to the entity type (e.g. Organization: Name, Employees, Location, Website).
+3. For CSV: read and render as a markdown table with columns appropriate to the entity type.
 4. Offer pagination (`--size N`, `--from K`) or query refinement.
 
 ## Performance discipline
