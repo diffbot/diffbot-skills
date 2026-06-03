@@ -29,7 +29,7 @@ Text can be passed as a CLI argument or piped via stdin.
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q git+https://github.com/diffbot/diffbot-python
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q diffbot-python
 ```
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:

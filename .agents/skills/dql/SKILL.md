@@ -39,7 +39,7 @@ Prefer `--out <file>` over stdout for anything but tiny result sets: use `probe`
 First ensure the venv exists and the library is installed, then run `init`. Guard the venv creation so it only runs when the venv is missing — re-running `python3 -m venv` on an existing venv overwrites activation scripts and fails if any are read-only:
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q git+https://github.com/diffbot/diffbot-python
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q diffbot-python
 ~/.diffbot/venv/bin/db dql init
 ```
 
