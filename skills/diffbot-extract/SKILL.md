@@ -1,5 +1,5 @@
 ---
-name: extract
+name: diffbot-extract
 description: "Extract markdown or structured content from a URL using the Diffbot Extract API. Use when the user wants to scrape, parse, fetch, or extract content from a webpage. Triggers on: extract URL, fetch page, parse webpage, get content from URL, extract article, extract structured data."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---

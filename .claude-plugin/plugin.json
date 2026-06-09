@@ -1,0 +1,21 @@
+{
+  "name": "diffbot",
+  "version": "1.0.0",
+  "description": "Structured web knowledge for developers. Claude authors DQL to query Diffbot's web-scale knowledge of organizations, people, and articles — ontology-aware and exported as typed JSON or CSV — plus skills to extract, resolve entities, and crawl for your own structured data.",
+  "author": {
+    "name": "Diffbot",
+    "url": "https://diffbot.com"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/diffbot/diffbot-skills",
+  "homepage": "https://docs.diffbot.com/docs/getting-started-with-diffbot",
+  "keywords": [
+    "web-knowledge",
+    "structured-data",
+    "dql",
+    "knowledge-graph",
+    "entity-search",
+    "company-research",
+    "developer-tools"
+  ]
+}

@@ -1,5 +1,5 @@
 ---
-name: entities
+name: diffbot-entities
 description: "Identify and resolve named entities in text using the Diffbot NLP API. Links mentions to Diffbot Knowledge Graph entities with confidence scores and sentiment. Use when the user wants to extract entities from text, do NER (named entity recognition), identify companies or people mentioned, or get Diffbot IDs for entities. Triggers on: identify entities, entity recognition, NER, find entities in text, extract entities, entity linking, diffbot NLP, named entity."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---

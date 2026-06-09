@@ -1,5 +1,5 @@
 ---
-name: web-search
+name: diffbot-web-search
 description: "Search the web using the Diffbot LLM web search API. Use when the user wants to search the web, find recent news or pages, or get ranked web results with snippets. Triggers on: web search, search the web, diffbot search, search online, find web pages, web results."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---
