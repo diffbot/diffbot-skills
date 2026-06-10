@@ -1,0 +1,6 @@
+{
+  "name": "diffbot",
+  "description": "Structured web knowledge for developers via Diffbot. The droid authors DQL queries against a web-scale knowledge graph of organizations, people, and articles — exploring the ontology, probing selectivity, and exporting typed JSON or CSV — plus skills to extract page content, resolve named entities, and crawl sites.",
+  "source": "./plugins/diffbot",
+  "category": "research"
+}
