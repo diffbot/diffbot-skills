@@ -36,7 +36,7 @@ intentionally not shipped as plugin context). See `validation-proof.md`.
 **Plugin name**
 
 ```
-Diffbot
+diffbot
 ```
 
 **Repository / source**
