@@ -1,8 +1,8 @@
-/*
-  Community-marketplace submission — paste-ready content for the in-app form.
-  This is the ACTIVE submission path. The official marketplace
-  (claude-plugins-official) has no application process; see README.md.
-*/
+/_
+Community-marketplace submission — paste-ready content for the in-app form.
+This is the ACTIVE submission path. The official marketplace
+(claude-plugins-official) has no application process; see README.md.
+_/
 
 # Community submission — `claude-community`
 
@@ -12,9 +12,9 @@ safety-screened, and SHA-pinned into
 
 ## Where to submit
 
-| Form | Use when | URL |
-| --- | --- | --- |
-| **Console** | Individual author, no Team/Enterprise org | https://platform.claude.com/plugins/submit |
+| Form          | Use when                                                                            | URL                                                                |
+| ------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Console**   | Individual author, no Team/Enterprise org                                           | https://platform.claude.com/plugins/submit                         |
 | **claude.ai** | You have a Team/Enterprise org + directory management access (Owners do by default) | https://claude.ai/admin-settings/directory/submissions/plugins/new |
 
 Diffbot has no Team/Enterprise org wired up for this, so use the **Console** form
@@ -36,7 +36,7 @@ intentionally not shipped as plugin context). See `validation-proof.md`.
 **Plugin name**
 
 ```
-diffbot
+Diffbot
 ```
 
 **Repository / source**
@@ -51,7 +51,7 @@ approval, CI bumps the SHA pin automatically as you push new commits.
 **Plugin description**
 
 ```
-Structured web knowledge for developers via Diffbot. The agent authors DQL queries against a web-scale knowledge graph of organizations, people, and articles — exploring the ontology, probing selectivity, and exporting typed JSON or CSV — plus skills to extract page content, resolve named entities, and crawl sites.
+Structured web knowledge tools for development and research. Enables querying of Diffbot’s Knowledge Graph (for organizations, people, and news articles) as well as web extraction, crawling, entity resolution, and web search.
 ```
 
 **Example use cases**

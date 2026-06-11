@@ -1,7 +1,7 @@
 {
   "name": "diffbot",
   "version": "1.0.0",
-  "description": "Structured web knowledge for developers. The droid authors DQL to query Diffbot's web-scale knowledge of organizations, people, and articles — ontology-aware and exported as typed JSON or CSV — plus skills to extract, resolve entities, and crawl for your own structured data.",
+  "description": "Structured web knowledge tools for development and research. Enables querying of Diffbot’s Knowledge Graph (for organizations, people, and news articles) as well as web extraction, crawling, entity resolution, and web search.",
   "author": {
     "name": "Diffbot",
     "url": "https://diffbot.com"

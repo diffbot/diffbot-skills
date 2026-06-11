@@ -23,13 +23,11 @@
 
 ## Description (paste into issue body)
 
-Structured web knowledge for developers via Diffbot. The agent authors DQL
-queries against a web-scale knowledge graph of organizations, people, and
-articles — exploring the ontology, probing selectivity, and exporting typed JSON
-or CSV — plus skills to extract page content, resolve named entities, and crawl
-sites. Five skills, prefixed `diffbot-` for flat-namespace collision safety:
-`/diffbot-dql`, `/diffbot-web-search`, `/diffbot-extract`, `/diffbot-entities`,
-`/diffbot-crawl`.
+Structured web knowledge tools for development and research. Enables querying of
+Diffbot’s Knowledge Graph (for organizations, people, and news articles) as well
+as web extraction, crawling, entity resolution, and web search. Five skills,
+prefixed `diffbot-` for flat-namespace collision safety: `/diffbot-dql`,
+`/diffbot-web-search`, `/diffbot-extract`, `/diffbot-entities`, `/diffbot-crawl`.
 
 ## Pre-submission checklist (already met)
 
