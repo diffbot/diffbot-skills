@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 *.pyo
 .cursor/
+dist/
+.DS_Store
