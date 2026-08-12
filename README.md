@@ -15,12 +15,8 @@ Install directly from this public Git repository on every supported harness. Cur
 **Claude Code**
 
 ```bash
-git clone https://github.com/diffbot/diffbot-skills.git
-cd diffbot-skills
-claude --plugin-dir .
+git clone https://github.com/diffbot/diffbot-skills.git ~/.claude/skills/diffbot-skills
 ```
-
-Pass `--plugin-dir` with the repo path when you start Claude Code. Clone to a stable location if you use this regularly.
 
 **GitHub Copilot (CLI + VS Code)**
 
