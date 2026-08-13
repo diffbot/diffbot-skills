@@ -3,6 +3,12 @@
 A multi-tool agent plugin that ships ten Diffbot skills (DQL-led structured web
 knowledge). Skills-only — no commands/, no .mcp.json.
 
+Distributed two ways from the same `skills/` tree:
+
+1. **`npx skills`** — harness-agnostic install into each agent's skills directory
+2. **Plugin manifests** — marketplace / native plugin install on Claude Code, Copilot,
+   Cortex Code, and Factory (Droid)
+
 ## Skill layering
 
 `diffbot-dql` is the general-purpose escape hatch — powerful but too broad for
@@ -127,6 +133,24 @@ different place; keep all four plugin manifests in sync (name, version, descript
   lists pi.dev under compatible harnesses, so keep the two repos' capability claims aligned when either
   ships new surface area.
 
+## `npx skills` install
+
+```bash
+npx skills add diffbot/diffbot-skills
+```
+
+Pulls this GitHub repo (skills are not published to npm). The CLI discovers
+`skills/*/SKILL.md` and installs into Claude Code, Cursor, Copilot, Pi, Droid,
+Cortex, ForgeCode, Codex, and [many more](https://github.com/vercel-labs/skills#supported-agents).
+Browse: [skills.sh](https://skills.sh).
+
+- This path reads nothing but `skills/*/SKILL.md` — no manifest is involved, so it works
+  on harnesses that have no addable manifest at all (ForgeCode) and needs no catalog listing.
+- **It depends on `name:` being present in every SKILL.md** — the CLI/agentskills.io use it
+  for discovery. See the naming section below; the two requirements happen to agree.
+- The CLI strips `name:` and `allowed-tools:` when it writes the universal `agent/skills/`
+  copies. That normalization is the CLI's, not a defect in this repo — don't "fix" it here.
+
 ## Skill naming — do NOT shorten to bare names
 
 Every skill is named with a `diffbot-` prefix (dir + `name:` frontmatter):
@@ -148,6 +172,9 @@ So generic names like `extract`/`crawl`/`entities`/`web-search` would collide wi
 other plugins — notably **firecrawl** (same `development` category) ships
 crawl/extract-style skills. Prefixing the skill `name` itself is the only fix that
 is collision-proof across all three tools regardless of their namespacing behavior.
+
+`name:` is also **required** by the `npx skills` CLI / agentskills.io for discovery, so
+dropping it to regain the `diffbot:` auto-prefix would break that install path outright.
 
 If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 

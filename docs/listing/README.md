@@ -1,6 +1,10 @@
 # Marketplace listing playbooks
 
-Internal docs for getting `diffbot` into each harness's curated catalog. Git-based install from this repo works on every platform today — see the README Install section.
+Internal docs for getting `diffbot` into each harness's curated catalog.
+
+**Universal install (any Agent Skills harness):** `npx skills add diffbot/diffbot-skills` — see the README Install section. That path does not require marketplace listing.
+
+**Plugin / marketplace install:** native plugin commands and curated catalogs below. Git-based plugin install from this repo also works on every listed platform today.
 
 **Pinned release:** `v1.1.0` @ `466f802ebadd8126bb09dc9fe9e81b736a8814b6`
 
@@ -20,4 +24,4 @@ Manifests in this repo (keep in sync):
 | Copilot / VS Code | `.github/plugin/plugin.json` |
 | Factory (Droid) | `.factory-plugin/plugin.json` |
 
-Skills auto-discover from `skills/` at the repo root. No `skills` path override in any manifest.
+Skills auto-discover from `skills/` at the repo root (`diffbot-*` dirs with required `name:` frontmatter for both plugin hosts and `npx skills`). No `skills` path override in any manifest.

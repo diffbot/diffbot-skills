@@ -6,6 +6,33 @@ Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Co
 
 ## Install
 
+Two supported paths from the same repo: `npx skills` for a one-command install into every detected agent, or the native plugin install for each harness.
+
+### Universal (`npx skills`)
+
+```bash
+npx skills add diffbot/diffbot-skills
+```
+
+Pulls this repo from GitHub (the skills are not published to npm). The CLI detects your installed agents and writes the skills into each one's skills directory — no marketplace listing involved.
+
+```bash
+# Preview the skills in the repo
+npx skills add diffbot/diffbot-skills --list
+
+# Install all ten skills globally to every detected agent
+npx skills add diffbot/diffbot-skills -g --all
+
+# Install to specific agents (includes Pi, Cursor, Codex, ForgeCode, …)
+npx skills add diffbot/diffbot-skills -g -a claude-code -a cursor -a pi -y
+
+# Pin a release tag (git ref via URL or #fragment — @name selects a skill, not a tag)
+npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.1.1
+npx skills add diffbot/diffbot-skills#v1.1.1
+```
+
+Supported agents include Claude Code, Cursor, GitHub Copilot, Codex, Pi, Factory (Droid), Snowflake Cortex Code, ForgeCode, Gemini CLI, OpenCode, and [many more](https://github.com/vercel-labs/skills#supported-agents). Discover packages at [skills.sh](https://skills.sh).
+
 ### Claude Code
 
 ```bash
@@ -79,7 +106,7 @@ These are curated catalogs run by others. They are convenience shortcuts only �
 | Claude Code | `/plugin install diffbot@claude-plugins-official` | `claude-plugins-official` | Submission in progress — see [`docs/listing/anthropic/`](docs/listing/anthropic/). The first-party `diffbot-skills` marketplace above needs no submission. |
 | GitHub Copilot | `/plugin install diffbot@awesome-copilot` | `awesome-copilot` | Submission in progress — see [`docs/listing/github/`](docs/listing/github/) |
 | Factory (Droid) | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` then `droid plugin install diffbot@factory-plugins` | `factory-plugins` | Not yet submitted — see [`docs/listing/factory/`](docs/listing/factory/) |
-| Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git install works today — see [`docs/listing/cortex/`](docs/listing/cortex/) |
+| Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git / `npx skills` work today — see [`docs/listing/cortex/`](docs/listing/cortex/) |
 
 Listing playbooks and handoff bundles: [`docs/listing/`](docs/listing/).
 
@@ -104,7 +131,7 @@ echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~
 
 Ten skills ship as one suite of structured-knowledge tools. **DQL is the headline capability** — ontology-aware entity querying that no other marketplace plugin offers. Five use-case skills sit on top of it for the queries people actually ask, and four API skills cover search, extraction, entity resolution, and crawling.
 
-Skill names are prefixed `diffbot-` to avoid collisions in the flat plugin namespace (e.g. `/diffbot-dql`, not `/dql`).
+Skill names are prefixed `diffbot-` to avoid collisions in the flat Agent Skills / plugin namespace (e.g. `/diffbot-dql`, not `/dql`).
 
 ### Knowledge Graph
 
@@ -229,7 +256,7 @@ This is structured knowledge querying — not page fetching, not generic web sea
 - **Python 3.10+** (used to bootstrap `~/.diffbot/venv`)
 - **`diffbot-python` >= 0.2.1**, installed automatically on first run
 - **Diffbot API token** (free tier available)
-- A supported agent harness with plugin support (see Install)
+- A supported agent (see Install)
 
 ## Permissions
 
