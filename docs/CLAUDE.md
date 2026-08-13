@@ -127,6 +127,15 @@ different place; keep all four plugin manifests in sync (name, version, descript
   skills only from `.forge/skills/<name>/SKILL.md` (project), `~/forge/skills/` (global), or the
   cross-tool `~/.agents/skills/` convention. Nothing to add to this repo; a Forge user copies/symlinks
   the SKILL.md files into `.forge/skills/`. (Don't confuse with Atlassian Forge or claude-forge — unrelated.)
+- **Cowork** is served by a **separate branch** — `cowork`, which carries `scripts/`
+  (bundling tooling) and `vendor/` (the `db` CLI plus its pinned dependency closure) on top
+  of `main`. Cowork's sandbox blocks PyPI, so its zip must ship the CLI inside it; every
+  install path on `main` bootstraps `~/.diffbot/venv` from PyPI instead and never reads
+  `vendor/`. Keeping those ~9.6 MB off `main` matters because `npx skills`, the plugin
+  marketplaces, and the Git clone path all download the repo. `vendor/` is in `.gitignore`
+  here so a rebase can't quietly reintroduce it — **don't "fix" that by untracking it on
+  `cowork`, where it must stay committed.** To ship a Cowork build, rebase `cowork` on
+  `main` and run `scripts/build-bundle.sh`; see `scripts/README.md` on that branch.
 - **pi.dev** is served by a **separate repository** — [`diffbot/diffbot-pi`](https://github.com/diffbot/diffbot-pi),
   a pi-wrapped TS library installed with `pi install git:github.com/diffbot/diffbot-pi`. Nothing to add
   to this repo and no fifth manifest to keep in sync: pi.dev never reads this `skills/` tree. The README
