@@ -106,9 +106,13 @@ different place; keep all four plugin manifests in sync (name, version, descript
 - Validate before release: `claude plugin validate .` checks `marketplace.json` when present, and
   `claude plugin validate .claude-plugin/plugin.json` checks the plugin manifest. `--strict` turns
   warnings into a non-zero exit for CI.
-- `--strict` currently fails on one warning: *"CLAUDE.md at the plugin root is not loaded as
-  project context."* This file is a maintainer doc, not shipped context — the warning is expected.
-  Move this file under `docs/` if you ever want a clean `--strict` run.
+- **This file lives at `docs/CLAUDE.md`, not the repo root — keep it there.** At the root it
+  tripped the only `--strict` warning (*"CLAUDE.md at the plugin root is not loaded as project
+  context"*), which blocked a green CI run. Moving it clears that.
+  - The tradeoff, so nobody "restores" it by accident: a root `CLAUDE.md` is auto-loaded as
+    project context when someone opens this repo to work on it; `docs/CLAUDE.md` is not — it
+    loads only when the agent is working inside `docs/`. Read it explicitly before editing
+    skills or manifests, and point agents at it in any task that touches them.
 
 ### Harnesses with NO addable manifest
 
