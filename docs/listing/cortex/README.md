@@ -35,4 +35,4 @@ Cortex docs describe `cortex plugin install <name>` resolving through an **offic
 2. Send **`handoff.md`** plus reused assets from [`anthropic/`](anthropic/) to the Snowflake partner contact.
 3. Once a marketplace name is assigned (target: `diffbot`), update the README marketplace table and this folder.
 
-Pinned release: `v1.1.0` @ _SHA recorded post-tag_.
+Pinned release: `v1.1.0` @ `466f802ebadd8126bb09dc9fe9e81b736a8814b6`.

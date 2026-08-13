@@ -2,7 +2,7 @@
 
 Internal docs for getting `diffbot` into each harness's curated catalog. Git-based install from this repo works on every platform today — see the README Install section.
 
-**Pinned release:** `v1.1.0` @ _SHA recorded post-tag_
+**Pinned release:** `v1.1.0` @ `466f802ebadd8126bb09dc9fe9e81b736a8814b6`
 
 | Platform | Catalog | Submission path | Folder |
 | --- | --- | --- | --- |

@@ -25,4 +25,4 @@ curator / partner contact opens up:
 - `positioning-brief.md` — 1-page, DQL-led positioning
 - `validation-proof.md` — captured `claude plugin validate` + smoke-test logs
 
-Pinned release: `v1.1.0` @ _SHA recorded post-tag_.
+Pinned release: `v1.1.0` @ `466f802ebadd8126bb09dc9fe9e81b736a8814b6`.

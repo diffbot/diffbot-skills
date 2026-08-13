@@ -10,7 +10,7 @@
 | Item | Where |
 | --- | --- |
 | Tagged release URL | https://github.com/diffbot/diffbot-skills/releases/tag/v1.1.0 |
-| Pinned SHA (40-char) | _recorded post-tag_ |
+| Pinned SHA (40-char) | `466f802ebadd8126bb09dc9fe9e81b736a8814b6` |
 | Manifest | `.cortex-plugin/plugin.json` at repo root |
 | Positioning brief | [`anthropic/positioning-brief.md`](anthropic/positioning-brief.md) (same product story; Cortex framing below) |
 | Validation proof | [`anthropic/validation-proof.md`](anthropic/validation-proof.md) (Claude validate + E2E; add Cortex logs when available) |

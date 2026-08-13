@@ -1,6 +1,6 @@
 /*
   Validation proof — captured during pre-release, v1.1.0.
-  Tag: v1.1.0 (SHA recorded post-tag, as with v1.0.0).
+  Tag: v1.1.0, pinned commit 466f802ebadd8126bb09dc9fe9e81b736a8814b6
 */
 
 # Validation proof — diffbot-skills v1.1.0

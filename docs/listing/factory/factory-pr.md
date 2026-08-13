@@ -9,7 +9,7 @@
 
 Adds the **diffbot** plugin: ten skills for Diffbot's structured web knowledge APIs, led by **DQL** (ontology-aware Knowledge Graph querying). Five use-case Knowledge Graph skills sit on top of DQL — news, organizations, people, places, deals — alongside web-search, extract, entities, and crawl. Skill names are prefixed `diffbot-` for flat-namespace collision safety.
 
-**Upstream:** https://github.com/diffbot/diffbot-skills (sync from tag `v1.1.0`, SHA recorded post-tag).
+**Upstream:** https://github.com/diffbot/diffbot-skills (sync from tag `v1.1.0`, SHA `466f802ebadd8126bb09dc9fe9e81b736a8814b6`).
 
 ## Plugin layout
 

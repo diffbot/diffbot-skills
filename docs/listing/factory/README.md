@@ -33,4 +33,4 @@ Factory tracks plugin versions by **Git commit** on marketplace update, not semv
 
 **Category:** `research` (KG querying, entity enrichment, competitive landscape). Alternatives: `productivity` if Factory prefers breadth.
 
-Pinned release to sync from: `v1.1.0` @ _SHA recorded post-tag_.
+Pinned release to sync from: `v1.1.0` @ `466f802ebadd8126bb09dc9fe9e81b736a8814b6`.

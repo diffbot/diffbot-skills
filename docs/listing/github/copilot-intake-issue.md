@@ -14,7 +14,7 @@
 | Repository | `diffbot/diffbot-skills` |
 | Plugin path | `/` (repo root) |
 | Ref | `v1.1.0` |
-| SHA | _recorded post-tag_ |
+| SHA | `466f802ebadd8126bb09dc9fe9e81b736a8814b6` |
 | Version | `1.1.0` |
 | License | `MIT` |
 | Author | Diffbot — https://diffbot.com |

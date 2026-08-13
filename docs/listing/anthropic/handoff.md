@@ -12,7 +12,7 @@ Send to the Anthropic/partner curator contact (not the community submission form
 | Item | Where |
 | --- | --- |
 | Tagged release URL | https://github.com/diffbot/diffbot-skills/releases/tag/v1.1.0 |
-| Pinned SHA (40-char) | _recorded post-tag_ |
+| Pinned SHA (40-char) | `466f802ebadd8126bb09dc9fe9e81b736a8814b6` |
 | Marketplace entry JSON | `marketplace-entry.json` (this folder) |
 | Positioning brief (1 page) | `positioning-brief.md` |
 | Validation proof | `validation-proof.md` |
@@ -29,7 +29,7 @@ Pattern matches firecrawl's entry in `anthropics/claude-plugins-official`
   "source": {
     "source": "url",
     "url": "https://github.com/diffbot/diffbot-skills.git",
-    "sha": "<SHA recorded post-tag>",
+    "sha": "466f802ebadd8126bb09dc9fe9e81b736a8814b6",
     "ref": "v1.1.0"
   }
 }
