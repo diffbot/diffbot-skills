@@ -9,8 +9,8 @@
   "source": {
     "source": "url",
     "url": "https://github.com/diffbot/diffbot-skills.git",
-    "sha": "44a20a931193596243d786ffb02959c8d75a5e8f",
-    "ref": "v1.0.0"
+    "sha": "REPLACE_WITH_V1_1_0_TAG_SHA",
+    "ref": "v1.1.0"
   },
   "homepage": "https://github.com/diffbot/diffbot-skills"
 }

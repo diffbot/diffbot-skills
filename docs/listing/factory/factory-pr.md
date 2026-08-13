@@ -7,9 +7,9 @@
 
 ## Summary
 
-Adds the **diffbot** plugin: five skills for Diffbot's structured web knowledge APIs, led by **DQL** (ontology-aware Knowledge Graph querying). Supporting skills: web-search, extract, entities, crawl. Skill names are prefixed `diffbot-` for flat-namespace collision safety.
+Adds the **diffbot** plugin: ten skills for Diffbot's structured web knowledge APIs, led by **DQL** (ontology-aware Knowledge Graph querying). Five use-case Knowledge Graph skills sit on top of DQL — news, organizations, people, places, deals — alongside web-search, extract, entities, and crawl. Skill names are prefixed `diffbot-` for flat-namespace collision safety.
 
-**Upstream:** https://github.com/diffbot/diffbot-skills (sync from tag `v1.0.0`, SHA `44a20a931193596243d786ffb02959c8d75a5e8f`).
+**Upstream:** https://github.com/diffbot/diffbot-skills (sync from tag `v1.1.0`, SHA recorded post-tag).
 
 ## Plugin layout
 
@@ -18,6 +18,11 @@ plugins/diffbot/
 ├── .factory-plugin/plugin.json
 └── skills/
     ├── diffbot-dql/SKILL.md
+    ├── diffbot-news/SKILL.md
+    ├── diffbot-organizations/SKILL.md
+    ├── diffbot-people/SKILL.md
+    ├── diffbot-places/SKILL.md
+    ├── diffbot-deals/SKILL.md
     ├── diffbot-web-search/SKILL.md
     ├── diffbot-extract/SKILL.md
     ├── diffbot-entities/SKILL.md
@@ -50,14 +55,14 @@ droid plugin install diffbot@factory-plugins
 ## Security / audit notes
 
 - Skills-only plugin — no hooks, MCP servers, or bundled scripts
-- Each skill pre-authorizes a fixed-path Bash allowlist (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, `jq` on DQL only)
+- Each skill pre-authorizes a fixed-path Bash allowlist (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, `jq` on the KG skills)
 - No secrets in repo; credentials user-managed
 
 ## Test plan
 
 - [ ] `droid plugin marketplace add` (fork) + `droid plugin install diffbot@factory-plugins`
 - [ ] `/diffbot-dql` discovers and runs a real KG query E2E with a valid API token
-- [ ] All five skills appear in the plugin skill list
+- [ ] All ten skills appear in the plugin skill list
 
 ## Post-listing
 

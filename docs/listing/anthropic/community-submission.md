@@ -45,7 +45,7 @@ diffbot
 https://github.com/diffbot/diffbot-skills.git
 ```
 
-Pinned release `v1.0.0` @ `44a20a931193596243d786ffb02959c8d75a5e8f`. After
+Pinned release `v1.1.0` @ _SHA recorded post-tag_. After
 approval, CI bumps the SHA pin automatically as you push new commits.
 
 **Plugin description**

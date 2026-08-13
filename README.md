@@ -8,7 +8,7 @@ Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Co
 
 Install directly from this public Git repository on every supported harness. Curated marketplace shortcuts are listed below where a catalog entry exists or is in progress.
 
-**Pinned release:** [v1.0.0](https://github.com/diffbot/diffbot-skills/releases/tag/v1.0.0) (`44a20a931193596243d786ffb02959c8d75a5e8f`)
+**Pinned release:** [v1.1.0](https://github.com/diffbot/diffbot-skills/releases/tag/v1.1.0) — adds `/diffbot-news`, `/diffbot-organizations`, `/diffbot-people`, `/diffbot-places`, and `/diffbot-deals`.
 
 ### From Git (recommended)
 
@@ -33,10 +33,10 @@ cortex plugin install diffbot/diffbot-skills
 Pin the release tag:
 
 ```bash
-cortex plugin install github:diffbot/diffbot-skills@v1.0.0
+cortex plugin install github:diffbot/diffbot-skills@v1.1.0
 ```
 
-**Cortex Code Desktop:** Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.0.0` to pin the tag).
+**Cortex Code Desktop:** Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.0` to pin the tag).
 
 **Factory.ai (Droid)**
 
@@ -46,7 +46,7 @@ droid plugin install https://github.com/diffbot/diffbot-skills.git
 
 **ForgeCode:** no installable manifest — copy or symlink the `skills/` tree into `.forge/skills/`.
 
-After install, invoke skills as `/diffbot-dql`, `/diffbot-web-search`, `/diffbot-extract`, `/diffbot-entities`, and `/diffbot-crawl`.
+After install, invoke skills as `/diffbot-dql`, `/diffbot-news`, `/diffbot-organizations`, `/diffbot-people`, `/diffbot-places`, `/diffbot-deals`, `/diffbot-web-search`, `/diffbot-extract`, `/diffbot-entities`, and `/diffbot-crawl`.
 
 ### From a marketplace (when listed)
 
@@ -74,36 +74,95 @@ Run this once on your machine (the skill will not write credentials for you):
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
 ```
 
-3. Invoke any skill — the first run bootstraps `~/.diffbot/venv` and installs [`diffbot-python`](https://pypi.org/project/diffbot-python/) from PyPI.
+3. Invoke any skill — the first run bootstraps `~/.diffbot/venv` and installs [`diffbot-python`](https://pypi.org/project/diffbot-python/) (>= 0.2.1) from PyPI.
 
 ## Skills
 
-Five skills ship as one suite of structured-knowledge tools. **DQL is the headline capability** — ontology-aware entity querying that no other marketplace plugin offers.
+Ten skills ship as one suite of structured-knowledge tools. **DQL is the headline capability** — ontology-aware entity querying that no other marketplace plugin offers. Five use-case skills sit on top of it for the queries people actually ask, and four API skills cover search, extraction, entity resolution, and crawling.
 
 Skill names are prefixed `diffbot-` to avoid collisions in the flat plugin namespace (e.g. `/diffbot-dql`, not `/dql`).
 
-### `/diffbot-dql` — Knowledge Graph queries
+### Knowledge Graph
 
-The agent translates your request into DQL, explores the ontology, probes query variants, and exports typed JSON or CSV.
+#### `/diffbot-news` — News and articles
+
+`type:Article` search, newest-first by default. Filter by mentioned entity, topic taxonomy, publisher, language, date range, or sentiment.
 
 ```
-/diffbot-dql find public semiconductor companies in the US
-/diffbot-dql show me CTOs at public biotech companies
-/diffbot-dql recent negative articles about OpenAI
+/diffbot-news recent AI news
+/diffbot-news negative coverage of OpenAI this month
+/diffbot-news what has Sam Altman been quoted saying
+/diffbot-news European coverage of the Nvidia earnings
+```
+
+#### `/diffbot-organizations` — Company search
+
+`type:Organization` search by industry, headquarters, headcount, revenue, funding, ownership, or leadership.
+
+```
+/diffbot-organizations public semiconductor companies in the US
+/diffbot-organizations AI software startups in Berlin under 100 employees
+/diffbot-organizations companies like OpenAI, US only
+/diffbot-organizations companies Sequoia has invested in
+/diffbot-organizations everything Microsoft has acquired
+```
+
+#### `/diffbot-people` — People search
+
+`type:Person` search by job title, employer, employer industry, skills, education, location, or nationality. Covers people with a public online professional presence — it is not a people-finder for private individuals.
+
+```
+/diffbot-people who runs Nvidia
+/diffbot-people CTOs at biotech companies
+/diffbot-people Stanford CS alumni
+/diffbot-people female CEOs
+```
+
+#### `/diffbot-places` — Geographic entities
+
+Cities, counties, states, countries, regions, and points of interest — by name, population, prominence, containing place, or proximity.
+
+```
+/diffbot-places list all countries in Europe
+/diffbot-places largest cities in Japan by population
+/diffbot-places counties in California
+/diffbot-places national parks near Yosemite
+```
+
+#### `/diffbot-deals` — Funding and M&A
+
+Funding rounds, investments, and acquisitions by industry, date, size, series, investor, or company.
+
+```
+/diffbot-deals AI rounds over $50M this year
+/diffbot-deals Sequoia's recent investments
+/diffbot-deals largest acquisitions of 2026
+/diffbot-deals OpenAI funding history
+```
+
+#### `/diffbot-dql` — Raw Knowledge Graph queries
+
+The general-purpose escape hatch behind the five skills above. Use it for products, patents, job posts, facets, and anything else in the ontology. The agent translates your request into DQL, explores the ontology, probes query variants, and exports typed JSON or CSV.
+
+```
+/diffbot-dql products by a given brand
 /diffbot-dql top cities where data scientists work
-/diffbot-dql software startups in Berlin under 100 employees with a female CEO
+/diffbot-dql what industries dominate Berlin startups
+/diffbot-dql job posts mentioning Rust in the last month
 ```
 
-### `/diffbot-web-search` — Live web results
+### Web APIs
 
-Ranked results with relevance scores, URLs, dates, and content snippets. Useful when you need current events beyond the KG crawl schedule.
+#### `/diffbot-web-search` — Live web results
+
+Ranked results with relevance scores, URLs, dates, and content snippets. For general web pages and lookups that aren't news — use `/diffbot-news` for news.
 
 ```
 /diffbot-web-search AI chip startups 2024
 /diffbot-web-search recent earnings reports Tesla
 ```
 
-### `/diffbot-extract` — Structured page content
+#### `/diffbot-extract` — Structured page content
 
 Fetch and extract structured content from any URL — markdown by default, full JSON on request.
 
@@ -112,7 +171,7 @@ Fetch and extract structured content from any URL — markdown by default, full 
 /diffbot-extract https://example.com/product-page
 ```
 
-### `/diffbot-entities` — Named entity resolution
+#### `/diffbot-entities` — Named entity resolution
 
 Identify and link entities in text to Diffbot KG records. Returns confidence, salience, sentiment, and Diffbot IDs usable in DQL.
 
@@ -121,7 +180,7 @@ Identify and link entities in text to Diffbot KG records. Returns confidence, sa
 /diffbot-entities Elon Musk founded Tesla and SpaceX.
 ```
 
-### `/diffbot-crawl` — Site crawling
+#### `/diffbot-crawl` — Site crawling
 
 Crawl a website for structured content and manage crawler jobs.
 
@@ -144,12 +203,13 @@ This is structured knowledge querying — not page fetching, not generic web sea
 ## Requirements
 
 - **Python 3.10+** (used to bootstrap `~/.diffbot/venv`)
+- **`diffbot-python` >= 0.2.1**, installed automatically on first run
 - **Diffbot API token** (free tier available)
 - A supported agent harness with plugin support (see Install)
 
 ## Permissions
 
-Each skill pre-authorizes a minimal fixed-path Bash allowlist: `db`, venv creation, `pip install`, and `jq` (DQL only). No broad `Bash(*)` grants. Credentials are user-managed at `~/.diffbot/credentials` and never stored in this repo.
+Each skill pre-authorizes a minimal fixed-path Bash allowlist: `db`, venv creation, `pip install`, and `jq` (Knowledge Graph skills only). No broad `Bash(*)` grants. Credentials are user-managed at `~/.diffbot/credentials` and never stored in this repo.
 
 ## License
 

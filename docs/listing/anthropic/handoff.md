@@ -3,7 +3,7 @@
   claude-plugins-official listing.
 */
 
-# Anthropic listing handoff — diffbot-skills v1.0.0
+# Anthropic listing handoff — diffbot-skills v1.1.0
 
 Send to the Anthropic/partner curator contact (not the community submission form).
 
@@ -11,8 +11,8 @@ Send to the Anthropic/partner curator contact (not the community submission form
 
 | Item | Where |
 | --- | --- |
-| Tagged release URL | https://github.com/diffbot/diffbot-skills/releases/tag/v1.0.0 |
-| Pinned SHA (40-char) | `44a20a931193596243d786ffb02959c8d75a5e8f` |
+| Tagged release URL | https://github.com/diffbot/diffbot-skills/releases/tag/v1.1.0 |
+| Pinned SHA (40-char) | _recorded post-tag_ |
 | Marketplace entry JSON | `marketplace-entry.json` (this folder) |
 | Positioning brief (1 page) | `positioning-brief.md` |
 | Validation proof | `validation-proof.md` |
@@ -29,8 +29,8 @@ Pattern matches firecrawl's entry in `anthropics/claude-plugins-official`
   "source": {
     "source": "url",
     "url": "https://github.com/diffbot/diffbot-skills.git",
-    "sha": "44a20a931193596243d786ffb02959c8d75a5e8f",
-    "ref": "v1.0.0"
+    "sha": "<SHA recorded post-tag>",
+    "ref": "v1.1.0"
   }
 }
 ```

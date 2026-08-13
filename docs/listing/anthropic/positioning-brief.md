@@ -12,12 +12,17 @@ as needed.
 
 ## What it is
 
-An installable, skills-only agent plugin. Five skills ship as one suite, invoked
+An installable, skills-only agent plugin. Ten skills ship as one suite, invoked
 with a `diffbot-` prefix:
 
 | Skill | Capability |
 | --- | --- |
-| `/diffbot-dql` | **Headline.** Ontology-aware Knowledge Graph querying in DQL — explore types/fields, probe selectivity in parallel, export typed JSON or CSV. |
+| `/diffbot-news` | News and articles from the KG — by mentioned entity, topic taxonomy, publisher, language, date range, or sentiment. Newest-first by default. |
+| `/diffbot-organizations` | Company search by industry, headquarters, headcount, revenue, funding, ownership, or leadership — plus `similarTo` lookalike lists. |
+| `/diffbot-people` | People by job title, employer, employer industry, skills, education, location, or nationality. |
+| `/diffbot-places` | Cities, counties, states, countries, and points of interest by population, prominence, containing place, or proximity. |
+| `/diffbot-deals` | Funding rounds, investments, and acquisitions by industry, date, size, series, investor, or company. |
+| `/diffbot-dql` | **Headline.** Ontology-aware Knowledge Graph querying in DQL — explore types/fields, probe selectivity in parallel, export typed JSON or CSV. The general-purpose layer the five skills above are built on. |
 | `/diffbot-web-search` | Ranked live web results with scores, URLs, dates, snippets. |
 | `/diffbot-extract` | Structured page content from any URL (markdown by default, full JSON on request). |
 | `/diffbot-entities` | Named-entity resolution to KG records with confidence, salience, sentiment, and Diffbot IDs. |
@@ -53,7 +58,7 @@ search.** No other marketplace plugin in the `development` category offers it.
 - Dependencies install to a dedicated venv at `~/.diffbot/venv` from PyPI
   (`diffbot-python`). No vendored code.
 - **Minimal permissions:** each skill pre-authorizes only a fixed-path Bash allowlist
-  (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, plus `jq` on DQL only).
+  (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, plus `jq` on the KG skills).
   No broad `Bash(*)`. Credentials are user-managed at `~/.diffbot/credentials`,
   never in the repo.
 
@@ -61,14 +66,17 @@ search.** No other marketplace plugin in the `development` category offers it.
 
 - `claude plugin validate .` → passes (one benign warning: root `CLAUDE.md` is
   maintainer docs, intentionally not shipped as plugin context).
-- All five skills smoke-tested against PyPI `diffbot-python` 0.1.0.
-- `/diffbot-dql` runs a real KG query E2E — ontology cache, parallel probe, export
-  to `~/.diffbot/tmp/`, formatted results — with no permission loops.
+- All ten skills smoke-tested against PyPI `diffbot-python` 0.1.0.
+- The six Knowledge Graph skills each run a real query E2E — ontology cache,
+  parallel probe, export to `~/.diffbot/tmp/`, formatted results — with no
+  permission loops.
+- Every DQL string shipped in the five new SKILL.md files was executed against the
+  live KG before being written; documented traps were verified by observation.
 
 See `validation-proof.md` for the captured logs.
 
 ## Pinned release
 
-- **Tag:** `v1.0.0`
-- **SHA:** `44a20a931193596243d786ffb02959c8d75a5e8f`
+- **Tag:** `v1.1.0`
+- **SHA:** _recorded post-tag_
 - **Repo:** https://github.com/diffbot/diffbot-skills

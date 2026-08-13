@@ -18,4 +18,4 @@ plugin marketplace.
 4. Once approved, update the README Copilot install line to add
    `/plugin install diffbot@awesome-copilot`.
 
-Pinned release: `v1.0.0` @ `44a20a931193596243d786ffb02959c8d75a5e8f`.
+Pinned release: `v1.1.0` @ _SHA recorded post-tag_.

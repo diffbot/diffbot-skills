@@ -1,7 +1,63 @@
 # diffbot-skills
 
-A multi-tool agent plugin that ships five Diffbot skills (DQL-led structured web
+A multi-tool agent plugin that ships ten Diffbot skills (DQL-led structured web
 knowledge). Skills-only — no commands/, no .mcp.json.
+
+## Skill layering
+
+`diffbot-dql` is the general-purpose escape hatch — powerful but too broad for
+most agents to route to correctly. Five use-case skills sit on top of it, each
+pinning an entity type and pre-selecting the levers for that shape:
+
+| Skill | Type | Baked-in defaults |
+| --- | --- | --- |
+| `diffbot-news` | `Article` | `sortBy:date` unless the user gives a sort or a date condition |
+| `diffbot-organizations` | `Organization` | `categories.name` first; singular `location` = HQ |
+| `diffbot-people` | `Person` | `employments.{…}` co-constraint is mandatory; `revSortBy:importance` |
+| `diffbot-places` | `Place` + `City`/`Subregion`/`Region`/`Country` | narrowest subtype; explicit sort always |
+| `diffbot-deals` | `Investment` / `Transaction` | routes to `Organization.investments` / `.acquiredBy` when the filter is industry or M&A |
+
+**organizations vs deals is settled by row shape**, not by subject matter: rows of
+companies → `diffbot-organizations`; rows of transactions/investments/deals →
+`diffbot-deals`. Both query the same `acquiredBy` and `investments` fields, so the
+overlap is real and the descriptions of both skills state the rule explicitly. Don't
+"fix" the apparent duplication by giving M&A wholly to one of them.
+
+Keep `diffbot-dql` as-is: the layered skills reference it for anything outside
+their shape (products, patents, job posts, facets beyond the documented cases).
+Its description deliberately makes the weakest claim of the ten — no `MUST USE` —
+so it loses every routing contest against a specific skill.
+
+`diffbot-people` owns `type:Person`; `diffbot-dql` no longer mentions people in its
+description or triggers. Don't add them back.
+
+`diffbot-people` states in its description, its intro, and a closing section that
+coverage is **public online professional presence only** — the KG is built from the
+public web and does not surface people who haven't published themselves. Keep all three:
+the skill must not read as a people-finder, absence of a person must never be reported
+as a factual negative, and person counts are a floor, not a census. This is a scope and
+privacy boundary, not filler — don't trim it for length.
+
+Their DQL guidance is verified against the live KG — including the traps
+(`investee.categories` doesn't exist, unknown field paths are silently ignored and
+return the unfiltered count, `type:Acquisition` records are name-only stubs,
+`Person.employments` conditions inflate ~9x without a `{}` co-constraint,
+`Person.descriptors` is unpopulated).
+
+**Don't add a sort unless the ordering is the question.** For non-Article types the
+default ranking already encodes relevance/prominence, and an explicit sort overrides it
+— measurably for the worse (`homepageUri:"openai.com"` unsorted → OpenAI; with
+`revSortBy:nbEmployees` → "OpenAI for Developers"). Articles are the deliberate
+exception: `diffbot-news` defaults to `sortBy:date`. An earlier revision told three
+skills to "always add an explicit sort"; that was wrong and is corrected.
+
+**The default JSON export payload is not the full entity.** Many filterable fields —
+`Organization.ceo`/`.founders`, `Place.population`/`.isPartOf` — are simply absent
+unless requested with `get:` (`--spec` requests its CSV columns automatically). A null
+in a JSON export usually means it wasn't requested. Confirm with `has:<field>` before
+writing "unpopulated" into a skill: an earlier revision wrongly documented
+`Place.isPartOf` as unpopulated on exactly this mistake — it is richly populated. Re-verify with
+`db dql probe` before editing those claims.
 
 ## Multi-tool manifests
 
@@ -38,9 +94,10 @@ different place; keep all three in sync (name, version, description, license):
 ## Skill naming — do NOT shorten to bare names
 
 Every skill is named with a `diffbot-` prefix (dir + `name:` frontmatter):
-`diffbot-dql`, `diffbot-web-search`, `diffbot-extract`, `diffbot-entities`,
-`diffbot-crawl`. Invoked as `/diffbot-dql`, etc. This is deliberate — do not
-"clean up" to `/dql`, `/extract`, etc.
+`diffbot-dql`, `diffbot-news`, `diffbot-organizations`, `diffbot-people`,
+`diffbot-places`, `diffbot-deals`, `diffbot-web-search`, `diffbot-extract`,
+`diffbot-entities`, `diffbot-crawl`. Invoked as `/diffbot-dql`, etc. This is
+deliberate — do not "clean up" to `/dql`, `/extract`, `/news`, `/people`, etc.
 
 Why: plugin skills share a **flat namespace** with every other installed plugin.
 Two compounding facts make bare names dangerous:

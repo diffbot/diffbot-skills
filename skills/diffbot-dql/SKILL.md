@@ -1,6 +1,6 @@
 ---
 name: diffbot-dql
-description: "Query the Diffbot Knowledge Graph using DQL (Diffbot Query Language). Use when the user wants to search for organizations, people, or articles in the Diffbot KG. Triggers on: search diffbot, query knowledge graph, dql search, find companies, find news articles, find people, latest news"
+description: "Query the Diffbot Knowledge Graph directly with DQL (Diffbot Query Language). The general-purpose layer beneath the entity-specific Diffbot skills — use it for any entity type or query shape they do not cover: products, patents, job posts, facet aggregations, ontology exploration, and cross-entity queries. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql"
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
 ---
 
@@ -39,7 +39,7 @@ Prefer `--out <file>` over stdout for anything but tiny result sets: use `probe`
 First ensure the venv exists and the library is installed, then run `init`. Guard the venv creation so it only runs when the venv is missing — re-running `python3 -m venv` on an existing venv overwrites activation scripts and fails if any are read-only:
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q diffbot-python
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot-python>=0.2.1'
 ~/.diffbot/venv/bin/db dql init
 ```
 
@@ -104,6 +104,21 @@ Every DQL string starts with `type:`. Start with common types (`Organization`, `
 | Sort ascending       | `sortBy:field`         | `sortBy:nbEmployees`                                                     |
 | Sort descending      | `revSortBy:field`      | `revSortBy:nbEmployees`                                                  |
 
+**`field:"value"` is CONTAINS, not equals**
+
+This is the root of most over-matching. `name:"Apple"` returns 68,068 organizations;
+`strict:name:"Apple"` returns 1,426; `strict:name:"Apple Inc."` returns 1. Whenever the
+user names a specific entity, start with `strict:`.
+
+Two consequences worth internalizing:
+
+- **`or()` is redundant when one string contains another.** `investment.series:"Series A"`
+  already matches `"Series A-1"`, so `or("Series A","Series A-1")` returns an identical
+  count.
+- **`or()` is mandatory when the spellings genuinely differ.** An abbreviation is not a
+  substring of its expansion: `employments.title:"Chief Executive Officer"` finds 521,798
+  people, while `or("Chief Executive Officer","CEO")` finds 2,620,747.
+
 **Subquery syntax for nested fields**
 
 Use `{}` to co-constrain multiple conditions on the same nested object:
@@ -136,6 +151,8 @@ Regex is slow and compute heavy. Avoid if possible. If to be used, stick to shor
 type:Organization similarTo(name:"OpenAI")
 ```
 
+Returns a ranked list of exactly `--size` similar companies; `hits` mirrors the size you requested rather than a true match count. Other clauses compose and narrow within the similarity search. **Do not validate it with `dql probe`** (see Step 3) — use a small `export --size 10` instead.
+
 **near operator**
 
 Finds entities within a given distance of a Place (default 15km; specify with `mi` or `km`). `near` operates on a single entity — if the subquery returns multiple, only the first is used.
@@ -149,6 +166,18 @@ type:Organization descriptors:"mexican restaurant" near(type:Organization name:"
 
 `get:<field,field2>` restricts response payload to specified fields (and descendants). Mostly relevant inside an exported payload — for testing query shape, use `dql probe` (hits only, no entity data).
 
+**The default payload is not the full entity — `get:` also *adds* fields.** A plain
+`--format json` export returns a trimmed record, and many filterable fields are simply
+absent from it. `type:Organization strict:name:"Tesla"` returns no `ceo` and no
+`founders` key at all; add `get:name,ceo,founders` and you get `ceo=Elon Musk`,
+`founders=JB Straubel, Martin Eberhard, Ian Wright, Marc Tarpenning, Elon Musk`. The
+same is true of `Place.population` and `Place.isPartOf`.
+
+So: **a missing or null field in a JSON export usually means you didn't request it, not
+that the data is absent.** Confirm with `has:<field>` before concluding a field is
+unpopulated. `--spec` on a CSV export requests its columns automatically, so only raw
+JSON exports need `get:`.
+
 **Facet queries**
 
 Use facets for aggregation/distribution questions ("what industries are common among Berlin startups?", "how are employees distributed across company sizes?"). A facet response has `value`, `count`, and `callbackQuery` per bucket — *not* `entity` records. Not appropriate when the user wants individual entity rows.
@@ -161,13 +190,16 @@ See [Facet Queries](https://docs.diffbot.com/docs/facet-queries.md) for full syn
 
 #### Entity-Specific Tips
 
-**Article**
- - `type:Article categories.name"<category name>"` is a great way to narrow down articles by topic. Use ontology taxonomy to look up the category names.
- - `type:Article tags.label:"<entity name>"` refines an article query by mentioned entities. There is no exhaustive list of tag values — they are simply entity names that may or may not appear in the KG. If `tags.label` is too restrictive, fall back to `text:` matching.
- - Unless otherwise stated, always end article queries with `sortBy:date`, which sorts the articles from newest to oldest.
+**Article** — use `/diffbot-news`, which owns this entity type and its defaults.
+Only reach for `type:Article` here when articles are one leg of a larger
+cross-entity query. `categories.name` narrows by topic, `tags.label` by mentioned
+entity, and `sortBy:date` orders newest-first.
 
-**Organization**
- - `categories.name` is usually an excellent starting point for crafting organization DQL
+**Organization** — use `/diffbot-organizations`. `categories.name` is usually the
+best starting point.
+
+**Place / Investment / Transaction** — use `/diffbot-places` and `/diffbot-deals`;
+both document field paths and traps that are easy to get wrong from scratch.
 
 ### Step 3 — Probe variants in parallel before committing
 
@@ -181,6 +213,10 @@ Before running the final query, probe candidate variants for hit counts to verif
 ```
 
 Output is a sorted text table of hit counts; add `--json` for machine-readable. This is the right way to test query selectivity — far faster than running them serially.
+
+**Exception — `similarTo` queries cannot be probed.** `probe` requests `size=0`, and `similarTo` reports `hits` equal to the requested size, so it always returns `0` here no matter how good the query is. That `0` reads as "no matches" and is meaningless. Skip this step for `similarTo` and validate with `export --size 10`.
+
+`probe` also fails the whole batch if any single variant is rejected by the API — fix the offending clause and re-run rather than assuming the other variants were checked.
 
 ### Step 4 — Export and display
 

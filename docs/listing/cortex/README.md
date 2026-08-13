@@ -8,10 +8,10 @@ Documented in the repo README. Quick reference:
 
 ```bash
 cortex plugin install diffbot/diffbot-skills
-cortex plugin install github:diffbot/diffbot-skills@v1.0.0   # pin release
+cortex plugin install github:diffbot/diffbot-skills@v1.1.0   # pin release
 ```
 
-Cortex Code Desktop: Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (optionally `#v1.0.0`).
+Cortex Code Desktop: Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (optionally `#v1.1.0`).
 
 Manifest: `.cortex-plugin/plugin.json` (preferred over `.claude-plugin/` when both exist).
 
@@ -35,4 +35,4 @@ Cortex docs describe `cortex plugin install <name>` resolving through an **offic
 2. Send **`handoff.md`** plus reused assets from [`anthropic/`](anthropic/) to the Snowflake partner contact.
 3. Once a marketplace name is assigned (target: `diffbot`), update the README marketplace table and this folder.
 
-Pinned release: `v1.0.0` @ `44a20a931193596243d786ffb02959c8d75a5e8f`.
+Pinned release: `v1.1.0` @ _SHA recorded post-tag_.
