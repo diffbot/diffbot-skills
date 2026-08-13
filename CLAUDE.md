@@ -62,11 +62,12 @@ writing "unpopulated" into a skill: an earlier revision wrongly documented
 ## Multi-tool manifests
 
 The same `skills/` tree is activated by per-tool manifests. Each tool looks in a
-different place; keep all three in sync (name, version, description, license):
+different place; keep all four plugin manifests in sync (name, version, description, license):
 
 | File | Tool | Notes |
 | --- | --- | --- |
 | `.claude-plugin/plugin.json` | Claude Code | Also the fallback Cortex and Copilot CLI read |
+| `.claude-plugin/marketplace.json` | Claude Code | Not a plugin manifest — it makes the repo its own single-plugin **marketplace** so `/plugin marketplace add diffbot/diffbot-skills` resolves. Coexists with `plugin.json` in the same directory |
 | `.cortex-plugin/plugin.json` | Snowflake Cortex Code | Preferred over `.claude-plugin/`; "if both present, `.cortex-plugin` wins" |
 | `.github/plugin/plugin.json` | GitHub Copilot CLI + VS Code | Note the `plugin/` subdir. The one path VS Code reads that `.claude-plugin/` does **not** cover |
 | `.factory-plugin/plugin.json` | Factory.ai (Droid) | No `.claude-plugin/` fallback — needs its own manifest. Components must stay at repo root, never inside `.factory-plugin/` |
@@ -80,8 +81,34 @@ different place; keep all three in sync (name, version, description, license):
   sibling to `.github/`), and against VS Code's documented auto-detect order
   (`.plugin/plugin.json` → root `plugin.json` → `.github/plugin/plugin.json` → `.claude-plugin/plugin.json`).
 - Copilot installs plugins from a marketplace (`marketplace.json` in `.github/plugin/` or
-  `.claude-plugin/`) or locally via `copilot plugin install <path>`. This repo ships the plugin
-  manifest only; a marketplace entry points its `source` at the repo.
+  `.claude-plugin/`) or locally via `copilot plugin install <path>`. The Claude Code
+  `marketplace.json` this repo ships is read by Claude Code only; Copilot still needs either its
+  own catalog entry or a local path install.
+
+### Claude Code specifics
+
+- `.claude-plugin/marketplace.json` uses `"source": "./"` — the repo is its own single-plugin
+  marketplace, the same shape `mvanhorn/last30days-skill` uses. Without this file
+  `/plugin marketplace add` has nothing to read and the only install path is a Git clone.
+- **The marketplace plugin entry deliberately omits `version`.** It is optional (14 of 287
+  entries in `anthropics/claude-plugins-official` carry it) and `plugin.json` is the single
+  source of truth. Don't add it back — it would become a fifth manifest to keep in sync.
+- **Both Claude Code install paths work; keep both in the README.** A clone into
+  `~/.claude/skills/diffbot-skills` loads as the `diffbot@skills-dir` plugin *because* the repo
+  ships `.claude-plugin/plugin.json` — the nested `skills/` tree is then discovered normally.
+  Verified: `claude plugin list` reports `diffbot@skills-dir` at the manifest version, ten skills. Adding
+  `marketplace.json` does not affect this path.
+  - The bare-directory rule is what trips people up: a directory in `~/.claude/skills/` with
+    **no** `plugin.json` is only discovered when `SKILL.md` is at its top level. `<dir>/skills/<name>/SKILL.md`
+    with no manifest is silently ignored. That is why the README says to clone the repo root.
+  - Skills-directory plugins load at **session start**, so a clone never appears in an
+    already-running session. The README says to restart; keep that note.
+- Validate before release: `claude plugin validate .` checks `marketplace.json` when present, and
+  `claude plugin validate .claude-plugin/plugin.json` checks the plugin manifest. `--strict` turns
+  warnings into a non-zero exit for CI.
+- `--strict` currently fails on one warning: *"CLAUDE.md at the plugin root is not loaded as
+  project context."* This file is a maintainer doc, not shipped context — the warning is expected.
+  Move this file under `docs/` if you ever want a clean `--strict` run.
 
 ### Harnesses with NO addable manifest
 
@@ -90,6 +117,11 @@ different place; keep all three in sync (name, version, description, license):
   skills only from `.forge/skills/<name>/SKILL.md` (project), `~/forge/skills/` (global), or the
   cross-tool `~/.agents/skills/` convention. Nothing to add to this repo; a Forge user copies/symlinks
   the SKILL.md files into `.forge/skills/`. (Don't confuse with Atlassian Forge or claude-forge — unrelated.)
+- **pi.dev** is served by a **separate repository** — [`diffbot/diffbot-pi`](https://github.com/diffbot/diffbot-pi),
+  a pi-wrapped TS library installed with `pi install git:github.com/diffbot/diffbot-pi`. Nothing to add
+  to this repo and no fifth manifest to keep in sync: pi.dev never reads this `skills/` tree. The README
+  lists pi.dev under compatible harnesses, so keep the two repos' capability claims aligned when either
+  ships new surface area.
 
 ## Skill naming — do NOT shorten to bare names
 

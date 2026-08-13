@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "diffbot-skills",
+  "description": "Structured web knowledge tools for development and research — DQL access to Diffbot's Knowledge Graph plus extraction, crawling, entity resolution, and web search.",
+  "owner": {
+    "name": "Diffbot",
+    "url": "https://diffbot.com"
+  },
+  "plugins": [
+    {
+      "name": "diffbot",
+      "description": "Structured web knowledge tools for development and research. Enables querying of Diffbot’s Knowledge Graph (for organizations, people, and news articles) as well as web extraction, crawling, entity resolution, and web search.",
+      "author": {
+        "name": "Diffbot",
+        "url": "https://diffbot.com"
+      },
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/diffbot/diffbot-skills"
+    }
+  ]
+}

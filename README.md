@@ -1,22 +1,36 @@
-# Diffbot — structured web knowledge for developers
+# Diffbot — structured web knowledge for agents
 
-An installable agent plugin that gives your coding agent access to Diffbot's web-scale knowledge graph and structured knowledge APIs. Query organizations, people, and articles with ontology-aware DQL — then enrich, extract, resolve entities, or crawl as needed.
+Give your agent access to Diffbot's Knowledge Graph and structured knowledge APIs. Query over a trillion facts on organizations, people, and news; Crawl and extract individual sites when needed.
 
-Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, and Factory.ai (Droid).
+Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
 
 ## Install
 
-Install directly from this public Git repository on every supported harness. Curated marketplace shortcuts are listed below where a catalog entry exists or is in progress.
+### Claude Code
 
-**Pinned release:** [v1.1.0](https://github.com/diffbot/diffbot-skills/releases/tag/v1.1.0) — adds `/diffbot-news`, `/diffbot-organizations`, `/diffbot-people`, `/diffbot-places`, and `/diffbot-deals`.
+```bash
+/plugin marketplace add diffbot/diffbot-skills
+/plugin install diffbot@diffbot-skills
+```
 
-### From Git (recommended)
+Update with `/plugin marketplace update diffbot-skills`.
 
-**Claude Code**
+**From Git (for local tweaking)**
 
 ```bash
 git clone https://github.com/diffbot/diffbot-skills.git ~/.claude/skills/diffbot-skills
 ```
+
+Checkout a local copy of `diffbot-skills` and tweak it into your own at the expense of maintaining your own upstream merge schedule.
+
+- **Restart Claude Code after cloning.** Skills-directory plugins are loaded at session start, so they will not appear in a session that is already running.
+- **Clone the repository root**, not the `skills/` subdirectory. A directory placed in `~/.claude/skills/` is only discovered without a `.claude-plugin/plugin.json` when its `SKILL.md` sits at the top level.
+
+Confirm the install with `claude plugin list` (expect `diffbot@skills-dir`, ten skills), and update later with `git -C ~/.claude/skills/diffbot-skills pull`.
+
+### Other harnesses
+
+Unlike Claude Code's fancy pants marketplace situation, it's almost always just a single line install with every other harness.
 
 **GitHub Copilot (CLI + VS Code)**
 
@@ -33,10 +47,10 @@ cortex plugin install diffbot/diffbot-skills
 Pin the release tag:
 
 ```bash
-cortex plugin install github:diffbot/diffbot-skills@v1.1.0
+cortex plugin install github:diffbot/diffbot-skills@v1.1.1
 ```
 
-**Cortex Code Desktop:** Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.0` to pin the tag).
+**Cortex Code Desktop:** Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.1` to pin the tag).
 
 **Factory.ai (Droid)**
 
@@ -46,13 +60,23 @@ droid plugin install https://github.com/diffbot/diffbot-skills.git
 
 **ForgeCode:** no installable manifest — copy or symlink the `skills/` tree into `.forge/skills/`.
 
+**pi.dev:** 
+
+This one comes with its own [pi-wrapped TS library](https://github.com/diffbot/diffbot-pi).
+
+```bash
+pi install git:github.com/diffbot/diffbot-pi
+```
+
 After install, invoke skills as `/diffbot-dql`, `/diffbot-news`, `/diffbot-organizations`, `/diffbot-people`, `/diffbot-places`, `/diffbot-deals`, `/diffbot-web-search`, `/diffbot-extract`, `/diffbot-entities`, and `/diffbot-crawl`.
 
-### From a marketplace (when listed)
+### From a third-party catalog (when listed)
+
+These are curated catalogs run by others. They are convenience shortcuts only — the install paths above work today and do not depend on any of them.
 
 | Harness | Install | Catalog | Status |
 | --- | --- | --- | --- |
-| Claude Code | `/plugin install diffbot@claude-plugins-official` | `claude-plugins-official` | Submission in progress — see [`docs/listing/anthropic/`](docs/listing/anthropic/) |
+| Claude Code | `/plugin install diffbot@claude-plugins-official` | `claude-plugins-official` | Submission in progress — see [`docs/listing/anthropic/`](docs/listing/anthropic/). The first-party `diffbot-skills` marketplace above needs no submission. |
 | GitHub Copilot | `/plugin install diffbot@awesome-copilot` | `awesome-copilot` | Submission in progress — see [`docs/listing/github/`](docs/listing/github/) |
 | Factory (Droid) | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` then `droid plugin install diffbot@factory-plugins` | `factory-plugins` | Not yet submitted — see [`docs/listing/factory/`](docs/listing/factory/) |
 | Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git install works today — see [`docs/listing/cortex/`](docs/listing/cortex/) |
