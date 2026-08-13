@@ -67,6 +67,15 @@ chmod +x "$vendor/bin/db"
 # Drop build cruft so the committed bundle stays lean and deterministic.
 find "$vendor" -name '__pycache__' -type d -prune -exec rm -rf {} +
 find "$vendor" -type f -name '*.pyc' -delete
+# pip also marks which packages were named on the command line; that set is a
+# property of this script, not of the bundle.
+find "$vendor" -type f -name 'REQUESTED' -delete
+# RECORD still lists the files just deleted, and names them with the *builder's*
+# Python ABI tag (cpython-311 vs -312) plus a hash of pip's machine-specific
+# console-script shebang. Left in, they make every regenerate on a different
+# machine produce a spurious diff. Strip the dead entries.
+find "$vendor" -type f -name 'RECORD' -exec perl -i -ne \
+  'print unless m{__pycache__} || m{^\.\./\.\./bin/} || m{/REQUESTED,}' {} +
 
 size="$(du -sh "$vendor" | awk '{print $1}')"
 echo "Vendored '$spec' into vendor/ ($size)."
