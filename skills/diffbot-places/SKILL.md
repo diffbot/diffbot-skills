@@ -157,6 +157,13 @@ Springfield on earth. Add `strict:` plus a `location.country.name` or
 `location.region.name` filter to pin one, and `facet:placeType` to see what mix of
 cities, subregions, and POIs a name spans.
 
+**Diacritics are not normalized, and coverage is inconsistent.** Query both spellings in
+one shot — `name:or("Kopavogur","Kópavogur")` — whenever a name could carry an accent.
+Verified: `name:"Kópavogur"` returns 1 city and `name:"Kopavogur"` returns 0 (as do
+`allNames:` and a prefix), while `type:Place name:"Reykjavik"` and `"Reykjavík"` both
+return 44. A zero from the ASCII spelling alone is not evidence of absence — never
+report a place as missing from the KG until the accented form has also returned 0.
+
 ### Step 5 — export and display
 
 ```

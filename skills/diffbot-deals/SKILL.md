@@ -1,6 +1,6 @@
 ---
 name: diffbot-deals
-description: "Search funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by date, deal size, round series, investor, acquirer, or industry — returns deals as rows: target, counterparty, amount, currency, date. MUST USE skill when the answer is a list of deals: deal flow, funding history for a company, or an investor's recent activity. When the rows should be companies instead (portfolio companies, everything Microsoft acquired), use diffbot-organizations. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
+description: "Search funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by date, deal size, round series, investor, acquirer, or industry — returns deals as rows: target, counterparty, amount, currency, date. MUST USE skill when the answer is a list of deals: deal flow, funding history for a company, or an investor's recent activity. Rows are deals, not companies. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
 ---
 

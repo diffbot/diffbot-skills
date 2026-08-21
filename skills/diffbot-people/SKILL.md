@@ -1,6 +1,6 @@
 ---
 name: diffbot-people
-description: "Search people in the Diffbot Knowledge Graph by job title, employer, employer industry, skills, education, location, or nationality. Covers people with a public online professional presence only — not a people-finder for private individuals. MUST USE skill when the answer is a list of people: executives at a company, alumni of a school, who holds a role, or who has a skill. Returns people as rows; for the companies themselves use diffbot-organizations. Triggers on: find people, who works at, executives at, employees of, CEO of, CTO of, leadership team, alumni of, people who studied, people with skill, board members, who founded."
+description: "Search people in the Diffbot Knowledge Graph by job title, employer, employer industry, skills, education, location, or nationality. Covers people with a public online professional presence only — not a people-finder for private individuals. MUST USE skill when the answer is a list of people: executives at a company, alumni of a school, who holds a role, or who has a skill. Rows are people, not companies. Triggers on: find people, who works at, executives at, employees of, CEO of, CTO of, leadership team, alumni of, people who studied, people with skill, board members, who founded."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
 ---
 

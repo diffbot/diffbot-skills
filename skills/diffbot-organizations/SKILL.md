@@ -1,6 +1,6 @@
 ---
 name: diffbot-organizations
-description: "Search companies and organizations in the Diffbot Knowledge Graph by industry, headquarters, headcount, revenue, funding raised, ownership, or leadership — plus similarTo lookalike lists for competitor mapping. MUST USE skill when the answer is a list of companies: prospecting, market maps, competitor sets, or who-does-X. Returns companies as rows; when the rows should be transactions, investments, or deals, use diffbot-deals. Triggers on: find companies, list companies, company search, competitors, companies like, startups in, firms, vendors, suppliers, who makes, market map, prospect list, company lookup."
+description: "Search companies and organizations in the Diffbot Knowledge Graph by industry, headquarters, headcount, revenue, funding raised, ownership, or leadership — plus similarTo lookalike lists for competitor mapping. MUST USE skill when the answer is a list of companies: prospecting, market maps, competitor sets, or who-does-X. Rows are companies, not deals. Triggers on: find companies, list companies, company search, competitors, companies like, startups in, firms, vendors, suppliers, who makes, market map, prospect list, company lookup."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
 ---
 

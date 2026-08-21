@@ -29,6 +29,14 @@ companies → `diffbot-organizations`; rows of transactions/investments/deals �
 overlap is real and the descriptions of both skills state the rule explicitly. Don't
 "fix" the apparent duplication by giving M&A wholly to one of them.
 
+The row-shape rule stays in every description; what was removed is the **cross-pointer
+naming the other skill** ("…use `diffbot-deals`"). Each now states only its own shape —
+"Rows are companies, not deals." Reason: a Haiku run picked `diffbot-organizations` first
+for "Who are the VPs of Engineering at Stripe?" on 2 of 2 attempts, and each description
+was planting the competitor's name inside itself for a smaller model to keyword-match on.
+Saves ~216 chars (~54 tokens) of always-on context. Don't re-add the pointers — state the
+skill's own row shape and let the reader route.
+
 Keep `diffbot-dql` as-is: the layered skills reference it for anything outside
 their shape (products, patents, job posts, facets beyond the documented cases).
 Its description deliberately makes the weakest claim of the ten — no `MUST USE` —
