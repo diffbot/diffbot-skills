@@ -220,9 +220,21 @@ Ranked results with relevance scores, URLs, dates, and content snippets. For gen
 /diffbot-web-search recent earnings reports Tesla
 ```
 
+Already have the URL? Query it with a `url:` prefix and Diffbot returns its
+pre-parsed copy of that page from the Web Index in ~300 ms — no live fetch, and it
+works on pages that block one:
+
+```
+/diffbot-web-search url:https://example.com/docs/api rate limits retry-after header
+```
+
+Use it for reference prose — docs, articles, papers, product pages. Fetch live when the
+page's *current* state is the question (status, prices, versions, feeds), or when the URL
+is an API endpoint, raw file, or PDF rather than a page.
+
 #### `/diffbot-extract` — Structured page content
 
-Fetch and extract structured content from any URL — markdown by default, full JSON on request.
+Fetch and extract structured content from any URL — markdown by default, full JSON on request. This is a live fetch (seconds per URL): use it for URLs the index lookup above misses, and for whole-document reads.
 
 ```
 /diffbot-extract https://example.com/article

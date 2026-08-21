@@ -1,12 +1,38 @@
 ---
 name: diffbot-extract
-description: "Extract markdown or structured content from a URL using the Diffbot Extract API. Use when the user wants to scrape, parse, fetch, or extract content from a webpage. Triggers on: extract URL, fetch page, parse webpage, get content from URL, extract article, extract structured data."
+description: "Extract markdown or structured content from a URL using the Diffbot Extract API — a live fetch and parse of the page, seconds per call. Try `/diffbot-web-search` with `url:<URL>` first: it reads Diffbot's already-extracted copy from the Web Index in ~300ms and answers most page questions outright. Use this skill when that lookup misses (URL not indexed) or when you need the complete document rather than the relevant chunks. Triggers on: extract URL, fetch page, parse webpage, get content from URL, extract article, extract structured data, full page text, whole article."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
 ---
 
 # Diffbot Extract
 
 Extract structured content from any URL via the Diffbot Extract API. The CLI returns a clean markdown rendering of the page by default.
+
+## First: is a live fetch actually needed?
+
+Extract is a **live retrieval** — it fetches and parses the page on demand. Measured on
+this CLI: 1.3 s–9 s for most URLs, 24 s cold for one docs page (0.8 s on a repeat), with
+an occasional aborted run. That is the cost of going to the origin.
+
+Diffbot has usually already parsed the page, and that copy is one index lookup away:
+
+```
+~/.diffbot/venv/bin/db web-search "url:<URL> <what you want to know>" -f json
+```
+
+~300 ms, one record back, and the chunks matching your terms — see `/diffbot-web-search`,
+which also covers when a cached copy is *not* safe to trust. Run it first for any public
+URL, the same way you would before reaching for `WebFetch` or `curl`. Come back here when:
+
+- `search_results` came back **empty** — the URL isn't indexed (too new, paywalled,
+  private, behind a login), so live retrieval is the only option;
+- you need the **whole document**, not the ~4–6 KB of chunks the index lookup returns —
+  every row of a table, a full changelog, an entire spec, license, or transcript
+  (that docs page: 4.3 KB of chunks from the index, 25.5 KB of text from Extract);
+- the page's **current state** is the question — a status page, a feed, a price, a
+  version number — where a snapshot of unknown age is worse than no answer;
+- you need Extract-only fields the search index doesn't carry: `author`, `images`,
+  `links`, `tags`, `sentiment`, or a typed `product`/`discussion` parse.
 
 ## The `db extract` CLI
 
@@ -81,6 +107,8 @@ The `objects[0]` structure from the `analyze`/`article` API includes:
 
 ## Tips
 
+- Re-check the index before extracting a batch of URLs: a `url:` lookup per URL costs
+  ~300 ms and usually removes the need to extract most of them.
 - The CLI normalizes URLs automatically — you can omit `https://`.
 - For saving article content to disk for later processing, use `-o` to avoid bloating the conversation context.
 - If extraction fails with a 4xx/5xx error code, the page may be behind auth, Cloudflare, or a JS SPA. Try `-a article` explicitly as a fallback.

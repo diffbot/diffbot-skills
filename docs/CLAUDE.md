@@ -65,6 +65,76 @@ writing "unpopulated" into a skill: an earlier revision wrongly documented
 `Place.isPartOf` as unpopulated on exactly this mistake — it is richly populated. Re-verify with
 `db dql probe` before editing those claims.
 
+## URL lookups: index before the harness's built-in fetch
+
+The competitor for a `url:` lookup is **the agent's own fetch tool** (`WebFetch`, `curl`,
+a browser tool), not `diffbot-extract`. `diffbot-web-search` is written that way on
+purpose — an earlier revision framed it as web-search vs. extract, which compares two
+Diffbot skills to each other and never reaches the decision the agent is actually making.
+Keep the built-in fetch as the named alternative in the description, the section heading,
+and the tips. `diffbot-extract` is the secondary note, not the headline.
+
+Querying with a `url:<URL>` prefix is an index lookup, not a retrieval. Verified live:
+
+- Exactly **one** `search_results` element for an indexed URL, **zero** for a miss.
+  Server `timeMs` 2–6; wall 300–376 ms across every URL tested.
+- URL matching normalizes scheme, missing scheme, and trailing slash to one record.
+- `score` on a `url:` hit reflects the *term* match, not the URL match — a single record
+  at 0.368 is a clean hit. Don't teach agents to threshold it.
+
+**The routing rule is prose vs. current state**, and it is load-bearing — not a hedge to
+trim. Verified failure cases on the "state" side:
+
+- `techcrunch.com` is cached as a **June 2025** snapshot; its "Latest News" is over a year old.
+- `status.anthropic.com` is cached as "All Systems Operational" **with no date field**.
+- The cached `docs.anthropic.com/…/prompt-caching` page still describes Claude 4 models.
+- `npmjs.com/package/react` returns the package prose, no version number.
+
+And on the "index wins" side, measured against this harness's `WebFetch`:
+
+- `reddit.com` → *"Claude Code is unable to fetch"*; `x.com` → *HTTP 402*. Both return an
+  index record (X gives the profile shell, not the timeline — don't oversell it).
+- `docs.anthropic.com/…/prompt-caching` → `WebFetch` returned a 301 to `platform.claude.com`
+  and demanded a second call; `url:` on the original URL returned 4.3 KB first try. Note the
+  new `platform.claude.com` URL **misses** the index — migrations cut both ways.
+
+**Non-page URLs are not in the index**: `api.github.com/repos/…`, `raw.githubusercontent.com`
+`.md`, `robots.txt`, and an arXiv `/pdf/` URL all missed, while the `/abs/` page hit. The
+built-in fetch is correct for those; say so rather than sending agents to retry the index.
+
+**`date` is not a freshness signal — never document it as one.** arXiv `/abs/` returns 2017
+(publication), the prompt-caching page returns Jun 2023, Reddit and the status page return
+nothing. The response carries no "cached at" value, which is why the rule keys on page kind.
+
+**`content` is chunks, never the full document.** `url:<URL>` alone ≈ 1.1 KB (the page
+opening); `url:<URL> <terms>` ≈ 4–6 KB of matching chunks. Extract returned 25.5 KB for the
+docs page against 4.3 KB from the index. The API marks a cut chunk with a literal `...`,
+which is the escalation signal the skills point at. Neither `maxTokens` (tested to 200000)
+nor `numChunks`/`chunks`/`fullContent`/`full` moves that ceiling — they are silently
+ignored, so don't add them as a "get the whole page" flag.
+
+Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
+repeat. An earlier revision of this file recorded a 30 s timeout returning nothing on that
+URL — that was a single non-reproducible run and the claim has been removed.
+
+## Small-model behavior (measured on Haiku)
+
+Verified with headless runs (`claude --plugin-dir . --model haiku -p …`), Opus on the same
+prompts as control. `claude plugin eval` would be the right harness but is gated on early access.
+
+- **Discovery and matching are fine.** Haiku lists all ten skills, and asked to route without
+  acting it maps population→`places`, executives→`people`, URL→`web-search`, all correct.
+- **Invocation is gated on the model's own confidence, not on the skill's claim.** "How many
+  people live in Reykjavik?" → Haiku answered from memory with no tool call, despite an exact
+  trigger-phrase match. The same prompt plus "use one of your available skills" → fired
+  `places`, returned 138,772, matching Opus. An obscure place (Kópavogur) fired the skill
+  unprompted. **`diffbot-places` already says "prefer it over recalling geographic figures"
+  and that was read and ignored — do not spend description tokens restating it.**
+- **Haiku's successful runs take 21–40 turns** where Opus takes 16. Verbose, not wrong.
+
+The practical read: description text cannot close the confidence gate. Model choice for KG
+work is the lever, not more words in the frontmatter.
+
 ## Multi-tool manifests
 
 The same `skills/` tree is activated by per-tool manifests. Each tool looks in a
