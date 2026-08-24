@@ -85,7 +85,7 @@ Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (app
 droid plugin install https://github.com/diffbot/diffbot-skills.git
 ```
 
-### ForgeCode:
+### ForgeCode
 
 Old school. Copy or symlink the `skills/` directory into `.forge/skills/`.
 
