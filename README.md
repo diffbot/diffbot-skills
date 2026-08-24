@@ -79,17 +79,17 @@ cortex plugin install github:diffbot/diffbot-skills@v1.1.1
 
 Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.1` to pin the tag).
 
-#### Factory.ai (Droid)
+### Factory.ai (Droid)
 
 ```bash
 droid plugin install https://github.com/diffbot/diffbot-skills.git
 ```
 
-#### ForgeCode:
+### ForgeCode:
 
 Old school. Copy or symlink the `skills/` directory into `.forge/skills/`.
 
-#### pi.dev
+### pi.dev
 
 This one comes with its own [pi-wrapped TS library](https://github.com/diffbot/diffbot-pi).
 
