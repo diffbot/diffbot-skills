@@ -1,6 +1,6 @@
 # Diffbot — structured web knowledge for agents
 
-Give your agent access to Diffbot's Knowledge Graph and structured knowledge APIs. Query over a trillion facts on organizations, people, and news; Crawl and extract individual sites when needed.
+Give your agent access to Diffbot's Knowledge Graph and web structuring APIs. Query over a trillion facts on organizations, people, and news; Crawl and extract sites to build your own structured knowledge graphs.
 
 Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
 
@@ -55,17 +55,15 @@ Checkout a local copy of `diffbot-skills` and tweak it into your own at the expe
 
 Confirm the install with `claude plugin list` (expect `diffbot@skills-dir`, ten skills), and update later with `git -C ~/.claude/skills/diffbot-skills pull`.
 
-### Other harnesses
+### GitHub Copilot (CLI + VS Code)
 
-Unlike Claude Code's fancy pants marketplace situation, it's almost always just a single line install with every other harness.
-
-**GitHub Copilot (CLI + VS Code)**
+Unlike Claude Code's fancy pants marketplace situation, every other harness keeps it simple.
 
 ```bash
 copilot plugin install https://github.com/diffbot/diffbot-skills.git
 ```
 
-**Snowflake Cortex Code (CLI)**
+### Snowflake Cortex Code (CLI)
 
 ```bash
 cortex plugin install diffbot/diffbot-skills
@@ -77,17 +75,21 @@ Pin the release tag:
 cortex plugin install github:diffbot/diffbot-skills@v1.1.1
 ```
 
-**Cortex Code Desktop:** Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.1` to pin the tag).
+#### Cortex Code Desktop
 
-**Factory.ai (Droid)**
+Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.1` to pin the tag).
+
+#### Factory.ai (Droid)
 
 ```bash
 droid plugin install https://github.com/diffbot/diffbot-skills.git
 ```
 
-**ForgeCode:** no installable manifest — copy or symlink the `skills/` tree into `.forge/skills/`.
+#### ForgeCode:
 
-**pi.dev:** 
+Old school. Copy or symlink the `skills/` directory into `.forge/skills/`.
+
+#### pi.dev
 
 This one comes with its own [pi-wrapped TS library](https://github.com/diffbot/diffbot-pi).
 
@@ -99,7 +101,7 @@ After install, invoke skills as `/diffbot-dql`, `/diffbot-news`, `/diffbot-organ
 
 ### From a third-party catalog (when listed)
 
-These are curated catalogs run by others. They are convenience shortcuts only — the install paths above work today and do not depend on any of them.
+These are curated third party catalogs that we have barely any control over but some people prefer these installation paths.
 
 | Harness | Install | Catalog | Status |
 | --- | --- | --- | --- |
@@ -107,8 +109,6 @@ These are curated catalogs run by others. They are convenience shortcuts only �
 | GitHub Copilot | `/plugin install diffbot@awesome-copilot` | `awesome-copilot` | Submission in progress — see [`docs/listing/github/`](docs/listing/github/) |
 | Factory (Droid) | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` then `droid plugin install diffbot@factory-plugins` | `factory-plugins` | Not yet submitted — see [`docs/listing/factory/`](docs/listing/factory/) |
 | Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git / `npx skills` work today — see [`docs/listing/cortex/`](docs/listing/cortex/) |
-
-Listing playbooks and handoff bundles: [`docs/listing/`](docs/listing/).
 
 ## Setup
 
@@ -193,16 +193,23 @@ Funding rounds, investments, and acquisitions by industry, date, size, series, i
 
 #### `/diffbot-dql` — Raw Knowledge Graph queries
 
-The general-purpose escape hatch behind the five skills above. Use it for products, patents, job posts, facets, and anything else in the ontology. The agent translates your request into DQL, explores the ontology, probes query variants, and exports typed JSON or CSV.
+Explore all other standard entities in the Diffbot Knowledge Graph not already covered above. There are tons more like CreativeWork, Brand, Patent, SaaS, Technology, even Research. The agent translates your request into DQL, explores the ontology, probes query variants, and exports typed JSON or CSV. 
 
 ```
-/diffbot-dql products by a given brand
-/diffbot-dql top cities where data scientists work
-/diffbot-dql what industries dominate Berlin startups
-/diffbot-dql job posts mentioning Rust in the last month
+/diffbot-dql show me all brand marks owned by Disney
+/diffbot-dql latest published research in artificial intelligence
 ```
 
-### Web APIs
+#### `/diffbot-entities` — Named entity resolution
+
+Identify and link entities in text to Diffbot KG records. Returns confidence, salience, sentiment, and Diffbot IDs usable in DQL.
+
+```
+/diffbot-entities Apple CEO Tim Cook announced record quarterly earnings.
+/diffbot-entities Elon Musk founded Tesla and SpaceX.
+```
+
+### Web Structuring
 
 #### `/diffbot-web-search` — Live web results
 
@@ -220,15 +227,6 @@ Fetch and extract structured content from any URL — markdown by default, full 
 ```
 /diffbot-extract https://example.com/article
 /diffbot-extract https://example.com/product-page
-```
-
-#### `/diffbot-entities` — Named entity resolution
-
-Identify and link entities in text to Diffbot KG records. Returns confidence, salience, sentiment, and Diffbot IDs usable in DQL.
-
-```
-/diffbot-entities Apple CEO Tim Cook announced record quarterly earnings.
-/diffbot-entities Elon Musk founded Tesla and SpaceX.
 ```
 
 #### `/diffbot-crawl` — Site crawling
