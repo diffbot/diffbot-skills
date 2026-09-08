@@ -2,7 +2,7 @@
 
 Give your agent access to Diffbot's Knowledge Graph and web structuring APIs. Query over a trillion facts on organizations, people, and news; Crawl and extract sites to build your own structured knowledge graphs.
 
-Compatible with Claude Code, Grok Build, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
+Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
 
 ## Install
 
@@ -54,16 +54,6 @@ Checkout a local copy of `diffbot-skills` and tweak it into your own at the expe
 - **Clone the repository root**, not the `skills/` subdirectory. A directory placed in `~/.claude/skills/` is only discovered without a `.claude-plugin/plugin.json` when its `SKILL.md` sits at the top level.
 
 Confirm the install with `claude plugin list` (expect `diffbot@skills-dir`, ten skills), and update later with `git -C ~/.claude/skills/diffbot-skills pull`.
-
-### Grok Build
-
-Listed in xAI's official catalog. Inside Grok Build:
-
-```text
-/marketplace
-```
-
-Find **diffbot** in the list and press `i` to install. The catalog pins a specific commit of this repo; see [`docs/listing/xai/`](docs/listing/xai/) for how releases reach Grok Build users.
 
 ### GitHub Copilot (CLI + VS Code)
 
