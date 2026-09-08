@@ -32,4 +32,4 @@ Inside Grok Build run `/marketplace`, find **diffbot**, and press `i` to install
 
 **Category:** `development` — the same category as the other web-data plugins in the catalog (firecrawl, exa, tavily). Their catalog has no `research` category.
 
-Pinned release: see the PR — `.grok-plugin/marketplace.json` in `xai-org/plugin-marketplace` is the source of truth for what Grok Build users receive.
+**Submitted:** [xai-org/plugin-marketplace#624](https://github.com/xai-org/plugin-marketplace/pull/624), pinning `c8d410cff0f318a20dbfa161a3ca4d6a3bacb1e9` (v1.1.1 + this manifest). `.grok-plugin/marketplace.json` in that repo is the source of truth for what Grok Build users receive.

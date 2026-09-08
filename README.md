@@ -116,7 +116,7 @@ These are curated third party catalogs that we have barely any control over but 
 | Harness | Install | Catalog | Status |
 | --- | --- | --- | --- |
 | Claude Code | `/plugin install diffbot@claude-plugins-official` | `claude-plugins-official` | Submission in progress — see [`docs/listing/anthropic/`](docs/listing/anthropic/). The first-party `diffbot-skills` marketplace above needs no submission. |
-| Grok Build | `/marketplace` → **diffbot** → `i` | `xai-official` | PR open to `xai-org/plugin-marketplace` — see [`docs/listing/xai/`](docs/listing/xai/) |
+| Grok Build | `/marketplace` → **diffbot** → `i` | `xai-official` | Submitted — [xai-org/plugin-marketplace#624](https://github.com/xai-org/plugin-marketplace/pull/624); see [`docs/listing/xai/`](docs/listing/xai/) |
 | GitHub Copilot | `/plugin install diffbot@awesome-copilot` | `awesome-copilot` | Submission in progress — see [`docs/listing/github/`](docs/listing/github/) |
 | Factory (Droid) | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` then `droid plugin install diffbot@factory-plugins` | `factory-plugins` | Not yet submitted — see [`docs/listing/factory/`](docs/listing/factory/) |
 | Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git / `npx skills` work today — see [`docs/listing/cortex/`](docs/listing/cortex/) |
