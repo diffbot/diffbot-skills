@@ -2,7 +2,7 @@
 
 Give your agent access to Diffbot's Knowledge Graph and web structuring APIs. Query over a trillion facts on organizations, people, and news; Crawl and extract sites to build your own structured knowledge graphs.
 
-Compatible with Claude Code, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
+Compatible with Claude Code, Grok Build, GitHub Copilot (CLI + VS Code), Snowflake Cortex Code, Factory.ai (Droid), and pi.dev. 
 
 ## Install
 
@@ -55,6 +55,16 @@ Checkout a local copy of `diffbot-skills` and tweak it into your own at the expe
 
 Confirm the install with `claude plugin list` (expect `diffbot@skills-dir`, ten skills), and update later with `git -C ~/.claude/skills/diffbot-skills pull`.
 
+### Grok Build
+
+Listed in xAI's official catalog. Inside Grok Build:
+
+```text
+/marketplace
+```
+
+Find **diffbot** in the list and press `i` to install. The catalog pins a specific commit of this repo; see [`docs/listing/xai/`](docs/listing/xai/) for how releases reach Grok Build users.
+
 ### GitHub Copilot (CLI + VS Code)
 
 Unlike Claude Code's fancy pants marketplace situation, every other harness keeps it simple.
@@ -106,6 +116,7 @@ These are curated third party catalogs that we have barely any control over but 
 | Harness | Install | Catalog | Status |
 | --- | --- | --- | --- |
 | Claude Code | `/plugin install diffbot@claude-plugins-official` | `claude-plugins-official` | Submission in progress — see [`docs/listing/anthropic/`](docs/listing/anthropic/). The first-party `diffbot-skills` marketplace above needs no submission. |
+| Grok Build | `/marketplace` → **diffbot** → `i` | `xai-official` | PR open to `xai-org/plugin-marketplace` — see [`docs/listing/xai/`](docs/listing/xai/) |
 | GitHub Copilot | `/plugin install diffbot@awesome-copilot` | `awesome-copilot` | Submission in progress — see [`docs/listing/github/`](docs/listing/github/) |
 | Factory (Droid) | `droid plugin marketplace add https://github.com/Factory-AI/factory-plugins` then `droid plugin install diffbot@factory-plugins` | `factory-plugins` | Not yet submitted — see [`docs/listing/factory/`](docs/listing/factory/) |
 | Cortex Code | `cortex plugin install diffbot` | Official Cortex marketplace | No public form — partner channel; Git / `npx skills` work today — see [`docs/listing/cortex/`](docs/listing/cortex/) |

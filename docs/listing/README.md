@@ -11,6 +11,7 @@ Internal docs for getting `diffbot` into each harness's curated catalog.
 | Platform | Catalog | Submission path | Folder |
 | --- | --- | --- | --- |
 | Claude Code | `claude-plugins-official` | Partner / curator handoff (no public form) | [`anthropic/`](anthropic/) |
+| Grok Build (xAI) | `xai-official` | PR to `xai-org/plugin-marketplace` (remote source, SHA-pinned) | [`xai/`](xai/) |
 | GitHub Copilot | `awesome-copilot` | External-plugin intake issue | [`github/`](github/) |
 | Snowflake Cortex Code | Official Cortex marketplace | Partner channel (no public PR form) | [`cortex/`](cortex/) |
 | Factory (Droid) | `factory-plugins` | PR to `Factory-AI/factory-plugins` | [`factory/`](factory/) |
@@ -20,6 +21,7 @@ Manifests in this repo (keep in sync):
 | Harness | Path |
 | --- | --- |
 | Claude Code | `.claude-plugin/plugin.json` |
+| Grok Build | `.grok-plugin/plugin.json` |
 | Cortex Code | `.cortex-plugin/plugin.json` |
 | Copilot / VS Code | `.github/plugin/plugin.json` |
 | Factory (Droid) | `.factory-plugin/plugin.json` |

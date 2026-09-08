@@ -1,0 +1,21 @@
+{
+  "name": "diffbot",
+  "version": "1.1.1",
+  "description": "Structured web knowledge tools for development and research. Enables querying of Diffbot’s Knowledge Graph (for organizations, people, and news articles) as well as web extraction, crawling, entity resolution, and web search.",
+  "author": {
+    "name": "Diffbot",
+    "url": "https://diffbot.com"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/diffbot/diffbot-skills",
+  "homepage": "https://docs.diffbot.com/docs/getting-started-with-diffbot",
+  "keywords": [
+    "diffbot",
+    "diffbot dql",
+    "diffbot knowledge graph",
+    "dql",
+    "knowledge-graph",
+    "web-knowledge",
+    "structured-data"
+  ]
+}

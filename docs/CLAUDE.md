@@ -6,8 +6,8 @@ knowledge). Skills-only — no commands/, no .mcp.json.
 Distributed two ways from the same `skills/` tree:
 
 1. **`npx skills`** — harness-agnostic install into each agent's skills directory
-2. **Plugin manifests** — marketplace / native plugin install on Claude Code, Copilot,
-   Cortex Code, and Factory (Droid)
+2. **Plugin manifests** — marketplace / native plugin install on Claude Code, Grok Build,
+   Copilot, Cortex Code, and Factory (Droid)
 
 ## Skill layering
 
@@ -146,17 +146,18 @@ work is the lever, not more words in the frontmatter.
 ## Multi-tool manifests
 
 The same `skills/` tree is activated by per-tool manifests. Each tool looks in a
-different place; keep all four plugin manifests in sync (name, version, description, license):
+different place; keep all five plugin manifests in sync (name, version, description, license):
 
 | File | Tool | Notes |
 | --- | --- | --- |
 | `.claude-plugin/plugin.json` | Claude Code | Also the fallback Cortex and Copilot CLI read |
+| `.grok-plugin/plugin.json` | Grok Build (xAI) | Read first by Grok Build; `.claude-plugin/plugin.json` is its fallback. Listed in `xai-org/plugin-marketplace` as a **remote source pinned to a commit SHA** — nothing vendored there, but users only get a new release when the pin is bumped (see `docs/listing/xai/`). xAI's daily `bump-plugin-shas` job advances the pin when `version` changes, so bump `version` on release |
 | `.claude-plugin/marketplace.json` | Claude Code | Not a plugin manifest — it makes the repo its own single-plugin **marketplace** so `/plugin marketplace add diffbot/diffbot-skills` resolves. Coexists with `plugin.json` in the same directory |
 | `.cortex-plugin/plugin.json` | Snowflake Cortex Code | Preferred over `.claude-plugin/`; "if both present, `.cortex-plugin` wins" |
 | `.github/plugin/plugin.json` | GitHub Copilot CLI + VS Code | Note the `plugin/` subdir. The one path VS Code reads that `.claude-plugin/` does **not** cover |
 | `.factory-plugin/plugin.json` | Factory.ai (Droid) | No `.claude-plugin/` fallback — needs its own manifest. Components must stay at repo root, never inside `.factory-plugin/` |
 
-- `license` is **required** by Copilot/GitHub — all four manifests carry it (MIT). Factory only requires name/description/version; extra fields are ignored.
+- `license` is **required** by Copilot/GitHub — all five manifests carry it (MIT). Factory only requires name/description/version; extra fields are ignored.
 - Skills auto-discover from `skills/`; no `skills` path field needed in any manifest.
 - **Copilot/VS Code manifest path = `.github/plugin/plugin.json` (with the `plugin/` subdir).**
   Some third-party guides say bare `.github/plugin.json` or repo-root `plugin.json` — those are
