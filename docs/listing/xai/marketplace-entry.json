@@ -1,6 +1,6 @@
 {
   "name": "diffbot",
-  "description": "Diffbot structured web knowledge (Skills). Query the Diffbot Knowledge Graph with DQL for organizations, people, places, news, and funding deals, plus web search, page extraction, entity resolution, and site crawling. Bring your own Diffbot API token; the skills bootstrap the diffbot-python CLI into ~/.diffbot/venv on first run.",
+  "description": "Diffbot structured web knowledge (Skills). Query the Diffbot Knowledge Graph with DQL for organizations, people, places, news, and funding deals, plus web search, page extraction, entity resolution, and site crawling. Bring your own Diffbot API token; the skills bootstrap the diffbot CLI (PyPI: diffbot) into ~/.diffbot/venv on first run.",
   "category": "development",
   "source": {
     "source": "url",

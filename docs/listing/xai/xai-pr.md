@@ -33,7 +33,7 @@ Adds the **diffbot** plugin: ten skills for Diffbot's structured web knowledge A
 - [x] No reading/exfiltration of secrets, tokens, `.env`, or env vars.
 - [x] Hooks and MCP scope are least-privilege — the plugin has no hooks and no MCP servers.
 - Network endpoints this plugin calls (and why):
-  - `pypi.org` / `files.pythonhosted.org` — first run creates `~/.diffbot/venv` and `pip install`s [`diffbot-python`](https://pypi.org/project/diffbot-python/) (>= 0.2.1), the `db` CLI every skill shells out to. Source: https://github.com/diffbot/diffbot-python.
+  - `pypi.org` / `files.pythonhosted.org` — first run creates `~/.diffbot/venv` and `pip install`s [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.0.0, formerly `diffbot-python`), the `db` CLI every skill shells out to. Source: https://github.com/diffbot/diffbot-python.
   - `kg.diffbot.com` — Knowledge Graph: DQL queries (`/kg/v3/dql`) and the ontology (`/kg/ontology`).
   - `api.diffbot.com` — Extract (`/v3/*`) and Crawl (`/v3/crawl`).
   - `llm.diffbot.com` — web search (`/api/v1/web_search`).
