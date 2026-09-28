@@ -56,7 +56,7 @@ search.** No other marketplace plugin in the `development` category offers it.
   `.github/plugin/`, `.factory-plugin/`) — no `.agents/` symlinks, real files under
   `skills/`. Easy to audit.
 - Dependencies install to a dedicated venv at `~/.diffbot/venv` from PyPI
-  (`diffbot-python`). No vendored code.
+  (`diffbot`, formerly `diffbot-python`). No vendored code.
 - **Minimal permissions:** each skill pre-authorizes only a fixed-path Bash allowlist
   (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, plus `jq` on the KG skills).
   No broad `Bash(*)`. Credentials are user-managed at `~/.diffbot/credentials`,

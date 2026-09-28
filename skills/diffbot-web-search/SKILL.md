@@ -91,10 +91,12 @@ breaks off at the part you need (the API marks a cut with a literal `...`), that
 | `-m`, `--max-tokens` | none | Caps total response tokens — trims from the bottom of the ranking |
 | `-f`, `--format` | `list` | Output format: `list` (rich terminal), `json` (raw API), `text` (plain/agent-friendly) |
 
-**Requires `diffbot-python` >= 0.2.0.** In 0.1.0 the library sent the wrong query
-parameter and `-n` was silently ignored — every call returned 10. The bootstrap in
-Step 1 pins `>=0.2.1`, so use it as written rather than a bare
-`pip install diffbot-python`, which will not upgrade an existing older venv.
+**Requires `diffbot` >= 3.0.0 (or the older `diffbot-python` >= 0.2.0).** In
+`diffbot-python` 0.1.0 the library sent the wrong query parameter and `-n` was
+silently ignored — every call returned 10. The bootstrap in Step 1 pins
+`diffbot>=3.0.0`, so use it as written rather than a bare `pip install diffbot`,
+which will not upgrade an existing older venv (and on its own could resolve to an
+unrelated pre-2016 package of the same name).
 
 `-m` is the other way to shrink a response, and it degrades sharply: measured on one
 query, 5000 → 10 results, 2000 → 5, 1000 → 1, and **200 → zero**. Below roughly 1000
@@ -107,7 +109,7 @@ results.
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot-python>=0.2.1'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
 ```
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:

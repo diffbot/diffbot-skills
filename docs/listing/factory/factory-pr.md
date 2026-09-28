@@ -50,7 +50,7 @@ droid plugin install diffbot@factory-plugins
 ## Setup (user)
 
 - Diffbot API token at `~/.diffbot/credentials` ([get token](https://app.diffbot.com/get-started/))
-- Python 3.10+ — first skill run bootstraps `~/.diffbot/venv` and installs `diffbot-python` from PyPI
+- Python 3.10+ — first skill run bootstraps `~/.diffbot/venv` and installs `diffbot` (formerly `diffbot-python`) from PyPI
 
 ## Security / audit notes
 

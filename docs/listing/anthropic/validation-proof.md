@@ -99,8 +99,9 @@ observation, not assumption:
 
 ## Dependency floor
 
-The Step 1 bootstrap in every skill pins `diffbot-python>=0.2.1` rather than the bare
-package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
+The Step 1 bootstrap in every skill pins `diffbot>=3.0.0` (at the time of this
+capture, `diffbot-python>=0.2.1`; the package has since been renamed) rather than
+the bare package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
 when *any* version is already present, so a venv created against 0.1.0 would never
 upgrade. 0.1.0 sent the wrong query parameter for web-search `-n`, silently returning
 10 results regardless — the version floor is what guarantees the documented flag

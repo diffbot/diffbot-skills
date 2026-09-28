@@ -17,7 +17,7 @@ Sibling skills: `/diffbot-news` (articles), `/diffbot-places` (geography), `/dif
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot-python>=0.2.1'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
 ~/.diffbot/venv/bin/db dql init
 ```
 
