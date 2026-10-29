@@ -99,7 +99,7 @@ observation, not assumption:
 
 ## Dependency floor
 
-The Step 1 bootstrap in every skill pins `diffbot>=3.0.0` (at the time of this
+The Step 1 bootstrap in every skill pins `diffbot>=3.1.0` (at the time of this
 capture, `diffbot-python>=0.2.1`; the package has since been renamed) rather than
 the bare package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
 when *any* version is already present, so a venv created against 0.1.0 would never

@@ -27,8 +27,8 @@ npx skills add diffbot/diffbot-skills -g --all
 npx skills add diffbot/diffbot-skills -g -a claude-code -a cursor -a pi -y
 
 # Pin a release tag (git ref via URL or #fragment — @name selects a skill, not a tag)
-npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.1.1
-npx skills add diffbot/diffbot-skills#v1.1.1
+npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.2.0
+npx skills add diffbot/diffbot-skills#v1.2.0
 ```
 
 Supported agents include Claude Code, Cursor, GitHub Copilot, Codex, Pi, Factory (Droid), Snowflake Cortex Code, ForgeCode, Gemini CLI, OpenCode, and [many more](https://github.com/vercel-labs/skills#supported-agents). Discover packages at [skills.sh](https://skills.sh).
@@ -72,12 +72,12 @@ cortex plugin install diffbot/diffbot-skills
 Pin the release tag:
 
 ```bash
-cortex plugin install github:diffbot/diffbot-skills@v1.1.1
+cortex plugin install github:diffbot/diffbot-skills@v1.2.0
 ```
 
 #### Cortex Code Desktop
 
-Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.1.1` to pin the tag).
+Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.2.0` to pin the tag).
 
 ### Factory.ai (Droid)
 
