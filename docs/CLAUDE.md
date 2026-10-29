@@ -114,12 +114,25 @@ built-in fetch is correct for those; say so rather than sending agents to retry 
 (publication), the prompt-caching page returns Jun 2023, Reddit and the status page return
 nothing. The response carries no "cached at" value, which is why the rule keys on page kind.
 
-**`content` is chunks, never the full document.** `url:<URL>` alone ≈ 1.1 KB (the page
-opening); `url:<URL> <terms>` ≈ 4–6 KB of matching chunks. Extract returned 25.5 KB for the
-docs page against 4.3 KB from the index. The API marks a cut chunk with a literal `...`,
-which is the escalation signal the skills point at. Neither `maxTokens` (tested to 200000)
-nor `numChunks`/`chunks`/`fullContent`/`full` moves that ceiling — they are silently
-ignored, so don't add them as a "get the whole page" flag.
+**`content` is chunks unless `snippetLength=FULL` is sent.** By default `url:<URL>` alone
+≈ 1.1 KB (the page opening) and `url:<URL> <terms>` ≈ 4–6 KB of matching chunks; the API
+marks a cut chunk with a literal `...`. `maxTokens` (tested to 200000) and guessed names
+like `numChunks`/`chunks`/`fullContent` do not move that ceiling. What does is the
+`snippetLength` parameter (`SHORT`/`MEDIUM`/`LONG`/`FULL`), exposed as `db web-search -s`
+from `diffbot` 3.1.0. `FULL` only works with `rerank=none` — the reranker always chunks —
+and the library sends both together. Measured: the prompt-caching docs page 3.4 KB at
+short/long vs 71.9 KB at full; a Wikipedia article 3.4 KB vs 13.4 KB. With full, query
+terms after the URL are ignored. An earlier revision of this file said nothing returns
+the whole page; that predated the parameter. `diffbot-mcp`'s `search_web` sends
+`snippetLength=full rerank=none` on a bare `url:` query for the same reason.
+
+**Package name:** the CLI ships as `diffbot` on PyPI (3.x). `diffbot-python` is the old
+name; its final 0.3.0 is a shim that installs the same files and warns. The bootstrap
+line in every skill installs `diffbot>=3.1.0`, then uninstalls a leftover `diffbot-python`
+and force-reinstalls `diffbot` — in that order, because uninstalling the shim deletes the
+shared module files and a plain install afterwards no-ops on the surviving dist-info.
+The line is idempotent (~0.6 s on a migrated venv). `allowed-tools` carries
+`pip uninstall` for this; keep the two in sync.
 
 Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
 repeat. An earlier revision of this file recorded a 30 s timeout returning nothing on that

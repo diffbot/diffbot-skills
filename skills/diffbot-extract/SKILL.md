@@ -1,7 +1,7 @@
 ---
 name: diffbot-extract
 description: "Extract markdown or structured content from a URL using the Diffbot Extract API — a live fetch and parse of the page, seconds per call. Try `/diffbot-web-search` with `url:<URL>` first: it reads Diffbot's already-extracted copy from the Web Index in ~300ms and answers most page questions outright. Use this skill when that lookup misses (URL not indexed) or when you need the complete document rather than the relevant chunks. Triggers on: extract URL, fetch page, parse webpage, get content from URL, extract article, extract structured data, full page text, whole article."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
 ---
 
 # Diffbot Extract
@@ -26,9 +26,9 @@ URL, the same way you would before reaching for `WebFetch` or `curl`. Come back 
 
 - `search_results` came back **empty** — the URL isn't indexed (too new, paywalled,
   private, behind a login), so live retrieval is the only option;
-- you need the **whole document**, not the ~4–6 KB of chunks the index lookup returns —
-  every row of a table, a full changelog, an entire spec, license, or transcript
-  (that docs page: 4.3 KB of chunks from the index, 25.5 KB of text from Extract);
+- you need the **whole document** and the index copy is incomplete — first try
+  `db web-search "url:<URL>" -s full`, which returns the entire stored page in the same
+  ~300 ms; come here only if that misses or the stored copy is thinner than the live page;
 - the page's **current state** is the question — a status page, a feed, a price, a
   version number — where a snapshot of unknown age is worse than no answer;
 - you need Extract-only fields the search index doesn't carry: `author`, `images`,
@@ -36,7 +36,7 @@ URL, the same way you would before reaching for `WebFetch` or `curl`. Come back 
 
 ## The `db extract` CLI
 
-All work in this skill is driven by the `db` CLI from the [`diffbot-python`](https://github.com/diffbot/diffbot-python) library. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`.**
+All work in this skill is driven by the `db` CLI from the [`diffbot`](https://github.com/diffbot/diffbot-python) library. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`.**
 
 ```
 ~/.diffbot/venv/bin/db extract <URL> [-f markdown|json] [-a <api>] [-o <outfile>]
@@ -53,7 +53,7 @@ All work in this skill is driven by the `db` CLI from the [`diffbot-python`](htt
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ```
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:

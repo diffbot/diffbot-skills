@@ -1,7 +1,7 @@
 ---
 name: diffbot-entities
 description: "Identify and resolve named entities in text using the Diffbot NLP API. Links mentions to Diffbot Knowledge Graph entities with confidence scores and sentiment. Use when the user wants to extract entities from text, do NER (named entity recognition), identify companies or people mentioned, or get Diffbot IDs for entities. Triggers on: identify entities, entity recognition, NER, find entities in text, extract entities, entity linking, diffbot NLP, named entity."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
 ---
 
 # Diffbot Entities (NLP)
@@ -29,7 +29,7 @@ Text can be passed as a CLI argument or piped via stdin.
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ```
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:

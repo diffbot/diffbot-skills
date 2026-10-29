@@ -1,7 +1,7 @@
 ---
 name: diffbot-dql
 description: "Query the Diffbot Knowledge Graph directly with DQL (Diffbot Query Language). The general-purpose layer beneath the entity-specific Diffbot skills — use it for any entity type or query shape they do not cover: products, patents, job posts, facet aggregations, ontology exploration, and cross-entity queries. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql"
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot Knowledge Graph Search (DQL)
@@ -10,7 +10,7 @@ Query the Diffbot Knowledge Graph via the DQL API. Translate the user's plain-te
 
 ## The `db dql` CLI
 
-All work in this skill is driven by the `db` CLI from the [`diffbot-python`](https://github.com/diffbot/diffbot-python) library. It owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing.
+All work in this skill is driven by the `db` CLI from the [`diffbot`](https://github.com/diffbot/diffbot-python) library. It owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing.
 
 **The skill runs the CLI from a dedicated virtualenv it owns at `~/.diffbot/venv`** — it does not assume `db` is on `PATH` or that any other venv exists. The Step 1 bootstrap creates the venv and installs the library if missing. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`** — never bare `db` and never another venv's `db`, so the permission allow rule matches and no `PATH` assumption is made. Throughout this document `db` is shorthand for `~/.diffbot/venv/bin/db`; expand it to the full path in every actual bash command.
 
@@ -39,7 +39,7 @@ Prefer `--out <file>` over stdout for anything but tiny result sets: use `probe`
 First ensure the venv exists and the library is installed, then run `init`. Guard the venv creation so it only runs when the venv is missing — re-running `python3 -m venv` on an existing venv overwrites activation scripts and fails if any are read-only:
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 

@@ -1,7 +1,7 @@
 ---
 name: diffbot-people
 description: "Search people in the Diffbot Knowledge Graph by job title, employer, employer industry, skills, education, location, or nationality. Covers people with a public online professional presence only — not a people-finder for private individuals. MUST USE skill when the answer is a list of people: executives at a company, alumni of a school, who holds a role, or who has a skill. Rows are people, not companies. Triggers on: find people, who works at, executives at, employees of, CEO of, CTO of, leadership team, alumni of, people who studied, people with skill, board members, who founded."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot People Search
@@ -24,7 +24,7 @@ these shapes.
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 

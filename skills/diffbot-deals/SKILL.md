@@ -1,7 +1,7 @@
 ---
 name: diffbot-deals
 description: "Search funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by date, deal size, round series, investor, acquirer, or industry — returns deals as rows: target, counterparty, amount, currency, date. MUST USE skill when the answer is a list of deals: deal flow, funding history for a company, or an investor's recent activity. Rows are deals, not companies. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot Deal Search
@@ -17,7 +17,7 @@ Sibling skills: `/diffbot-organizations` (companies as rows), `/diffbot-news`, `
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 

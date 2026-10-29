@@ -126,7 +126,7 @@ Run this once on your machine (the skill will not write credentials for you):
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
 ```
 
-3. Invoke any skill — the first run bootstraps `~/.diffbot/venv` and installs [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.0.0, formerly `diffbot-python`) from PyPI.
+3. Invoke any skill — the first run bootstraps `~/.diffbot/venv` and installs [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.1.0) from PyPI, replacing an older `diffbot-python` install in the same venv if one is present.
 
 ## Skills
 
@@ -265,7 +265,7 @@ This is structured knowledge querying — not page fetching, not generic web sea
 ## Requirements
 
 - **Python 3.10+** (used to bootstrap `~/.diffbot/venv`)
-- **`diffbot` >= 3.0.0** (formerly `diffbot-python`), installed automatically on first run
+- **`diffbot` >= 3.1.0** (formerly `diffbot-python`), installed automatically on first run
 - **Diffbot API token** (free tier available)
 - A supported agent (see Install)
 

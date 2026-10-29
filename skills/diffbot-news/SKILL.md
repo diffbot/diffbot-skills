@@ -1,7 +1,7 @@
 ---
 name: diffbot-news
 description: "Search news and articles in the Diffbot Knowledge Graph by mentioned company, person, topic, publisher, language, date range, or sentiment — returns dated, sourced, linkable results, newest first. MUST USE skill for all news, including breaking and developing stories. Use for coverage of an entity over time, sentiment trends, or who said what. Triggers on: news, recent news, latest news, breaking news, headlines, articles about, press coverage, media mentions, coverage of, what's being said about, news sentiment, quotes from."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot News Search
@@ -17,7 +17,7 @@ This is the skill for **all** news requests, breaking events included — the KG
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 

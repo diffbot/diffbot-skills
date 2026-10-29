@@ -1,7 +1,7 @@
 ---
 name: diffbot-web-search
 description: "Use for any web search, documentation search, or research request not falling under the DQL categories (news, organizations, people, places, deals). Returns ranked results with relevance scores, publication dates, and relevant chunks per result in one call. ALSO USE before calling WebFetch, curl, or any built-in fetch tool on a public URL: querying `url:<URL>` reads Diffbot's already-parsed copy of that page from the Web Index in ~300ms, and works on pages that block a live fetcher. Best for reference prose (docs, articles, papers); fetch live when the page's current state is the question (status, prices, versions, feeds) or the URL is an API endpoint, raw file, or PDF. Not for news — diffbot-news is a stronger tool and its article index is continuously updated. Triggers on: web search, search the web, search online, find web pages, look up online, find the url for, official site for, documentation for, docs for, how to, read this page, what does this link say, open this URL, summarize this page."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
 ---
 
 # Diffbot Web Search
@@ -25,6 +25,13 @@ of the query selects which chunks of it come back:
 
 ```
 ~/.diffbot/venv/bin/db web-search "url:https://example.com/docs/api rate limits retry-after header" -f json
+```
+
+For the whole stored page instead of chunks, pass `-s full`. Query terms are ignored in
+this mode, so leave them off:
+
+```
+~/.diffbot/venv/bin/db web-search "url:https://example.com/docs/api" -s full -f json
 ```
 
 ### The rule
@@ -71,32 +78,34 @@ ranking to weigh: `score` reflects the term match, not the URL match, so a lone 
 0.368 is still a clean hit. URL matching normalizes `http`/`https`, a missing scheme, and
 a missing trailing slash to the same record.
 
-`content` is chunks, not the document: ~1.1 KB for `url:<URL>` alone (the page's opening),
-~4–6 KB when you add query terms. Never present it as the full page. When you need the
-whole document — every row of a table, a full changelog, a complete spec — or when a chunk
-breaks off at the part you need (the API marks a cut with a literal `...`), that is what
-`/diffbot-extract` is for.
+Without `-s full`, `content` is chunks, not the document: ~1.1 KB for `url:<URL>` alone
+(the page's opening), ~4–6 KB when you add query terms. Never present a chunk as the full
+page. When you need the whole document — every row of a table, a full changelog, a complete
+spec — or when a chunk breaks off at the part you need (the API marks a cut with a literal
+`...`), re-run the bare `url:<URL>` with `-s full`: measured 72 KB for a long docs page and
+13 KB for a Wikipedia article, the complete stored copy. `/diffbot-extract` is for a URL
+the index does not have, or for a page whose current state matters.
 
 ## The `db web-search` CLI
 
 **Always invoke with the fixed path `~/.diffbot/venv/bin/db`.**
 
 ```
-~/.diffbot/venv/bin/db web-search "<query>" [-n <N>] [-m <max-tokens>] [-f list|json|text]
+~/.diffbot/venv/bin/db web-search "<query>" -s short|full [-n <N>] [-m <max-tokens>] [-f list|json|text]
 ```
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-n`, `--num-results` | 10 | Number of results to return |
+| `-s`, `--snippet-length` | `long` | `short`, `medium`, `long` or `full`: how much of each page's matching content comes back in `content`. **Always pass `-s short` for searches** — ~1–1.5 KB per result instead of 2.5–6 KB, and the matching sentence is still in the chunk. **Pass `-s full` for a `url:` read** of one whole page; it disables reranking, so query terms are ignored |
 | `-m`, `--max-tokens` | none | Caps total response tokens — trims from the bottom of the ranking |
 | `-f`, `--format` | `list` | Output format: `list` (rich terminal), `json` (raw API), `text` (plain/agent-friendly) |
 
-**Requires `diffbot` >= 3.0.0 (or the older `diffbot-python` >= 0.2.0).** In
-`diffbot-python` 0.1.0 the library sent the wrong query parameter and `-n` was
-silently ignored — every call returned 10. The bootstrap in Step 1 pins
-`diffbot>=3.0.0`, so use it as written rather than a bare `pip install diffbot`,
-which will not upgrade an existing older venv (and on its own could resolve to an
-unrelated pre-2016 package of the same name).
+**Requires `diffbot` >= 3.1.0** (`-s` was added in 3.1.0; the package was formerly
+`diffbot-python`, whose final release 0.3.0 lacks it). The bootstrap in Step 1 pins
+`>=3.1.0` and replaces a leftover `diffbot-python` in the same venv, so use it as written
+rather than a bare `pip install`. If `-s` is rejected as an unknown option, or `db` prints
+a `FutureWarning` about the rename, run the line from Step 1 again.
 
 `-m` is the other way to shrink a response, and it degrades sharply: measured on one
 query, 5000 → 10 results, 2000 → 5, 1000 → 1, and **200 → zero**. Below roughly 1000
@@ -109,7 +118,7 @@ results.
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ```
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
@@ -120,28 +129,33 @@ echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~
 
 ### Step 2 — search
 
+Pass `-s short` on every search. It caps each result's `content` at roughly 1–1.5 KB
+while keeping the sentence that matched, so eight results fit in one screen and a
+multi-query session does not fill the context window. For a `url:` read of a single
+page use `-s full` instead, which returns the whole stored page.
+
 Basic search (interactive rich display):
 
 ```
-~/.diffbot/venv/bin/db web-search "AI chip startups 2024"
+~/.diffbot/venv/bin/db web-search "AI chip startups 2024" -s short
 ```
 
 Get the top 5 results:
 
 ```
-~/.diffbot/venv/bin/db web-search "diffbot knowledge graph" -n 5
+~/.diffbot/venv/bin/db web-search "diffbot knowledge graph" -n 5 -s short
 ```
 
 Plain text output (for piping or agentic use):
 
 ```
-~/.diffbot/venv/bin/db web-search "recent earnings reports Tesla" -f text
+~/.diffbot/venv/bin/db web-search "recent earnings reports Tesla" -f text -s short
 ```
 
 Full raw JSON:
 
 ```
-~/.diffbot/venv/bin/db web-search "query" -f json
+~/.diffbot/venv/bin/db web-search "query" -f json -s short
 ```
 
 ## Result fields
@@ -158,15 +172,18 @@ Each result in the `search_results` array contains:
 
 **`content` is a chunk, not always the whole page.** It is selected for relevance to
 the query, so one call usually answers the question outright — don't reflexively fetch
-the page as a second step.
+the page as a second step. With `-s short` the chunk is ~1–1.5 KB; if it stops just
+before the part you need, re-run that one query with `-s long`, or read the whole page
+with `url:<pageUrl>` and `-s full`.
 
 Reach for `/diffbot-extract` on the result's `pageUrl` only when the chunk or its
 metadata *implies the answer is elsewhere on the page*: the chunk cuts off mid-section,
 it references a table, changelog, pricing tier, or API parameter it doesn't itself
 contain, or the title and score look right while the returned text covers a different
 part of the page. A cheaper first move is to re-query `url:<that pageUrl> <the missing
-thing>` — it pulls different chunks from the same page for another ~300 ms index hit.
-When you do extract, extract one promising URL rather than the whole result set.
+thing>` for different chunks, or `url:<that pageUrl>` with `-s full` for the whole page —
+either is another ~300 ms index hit. Extract only when the index has no copy or the page's
+current state matters, and then one promising URL rather than the whole result set.
 
 ## Output formats
 
@@ -177,6 +194,8 @@ When you do extract, extract one promising URL rather than the whole result set.
 ## Tips
 
 - Use `-f text` when you need to parse or relay results in a tool pipeline — it avoids rich markup.
+- Use `-s short` on every discovery search. A default-length `-n 8` call is 15–40 KB and
+  gets truncated or spilled to a file by most agent harnesses; the short form is 8–13 KB.
 - Use `-n` to limit result count; use `-m` only when you have a hard token budget, and keep it at 1000 or above.
 - Scores above 0.7 are generally trustworthy; below 0.5 suggests the result is loosely related.
 - Reaching for the built-in fetch tool is the moment to run a `url:` lookup instead —

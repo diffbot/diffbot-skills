@@ -1,7 +1,7 @@
 ---
 name: diffbot-organizations
 description: "Search companies and organizations in the Diffbot Knowledge Graph by industry, headquarters, headcount, revenue, funding raised, ownership, or leadership — plus similarTo lookalike lists for competitor mapping. MUST USE skill when the answer is a list of companies: prospecting, market maps, competitor sets, or who-does-X. Rows are companies, not deals. Triggers on: find companies, list companies, company search, competitors, companies like, startups in, firms, vendors, suppliers, who makes, market map, prospect list, company lookup."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot Organization Search
@@ -17,7 +17,7 @@ Sibling skills: `/diffbot-news` (articles), `/diffbot-places` (geography), `/dif
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 

@@ -1,7 +1,7 @@
 ---
 name: diffbot-places
 description: "Search geographic entities in the Diffbot Knowledge Graph — cities, counties, subregions, states, provinces, countries, and points of interest — by population, prominence, containing place, or proximity. MUST USE skill when the answer is a list of places, or a sourced fact about one such as population; prefer it over recalling geographic figures. Triggers on: list cities, list countries, largest cities, biggest city in, population of, how many people live in, places in, cities near, states in, provinces, counties, regions, points of interest, landmarks."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
 # Diffbot Place Search
@@ -17,7 +17,7 @@ Sibling skills: `/diffbot-organizations` (companies, including those *located* s
 ### Step 1 — bootstrap
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.0.0'
+[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
 ~/.diffbot/venv/bin/db dql init
 ```
 
