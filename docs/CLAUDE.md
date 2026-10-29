@@ -17,11 +17,11 @@ pinning an entity type and pre-selecting the levers for that shape:
 
 | Skill | Type | Baked-in defaults |
 | --- | --- | --- |
-| `diffbot-news` | `Article` | `sortBy:date` unless the user gives a sort or a date condition |
+| `diffbot-news` | `Article` | `sortBy:date` unless the user names a sort; a date window does not switch it off (matches `diffbot-mcp` `search_news`) |
 | `diffbot-organizations` | `Organization` | `categories.name` first; singular `location` = HQ |
 | `diffbot-people` | `Person` | `employments.{…}` co-constraint is mandatory; `revSortBy:importance` |
-| `diffbot-places` | `Place` + `City`/`Subregion`/`Region`/`Country` | narrowest subtype; explicit sort always |
-| `diffbot-deals` | `Investment` / `Transaction` | routes to `Organization.investments` / `.acquiredBy` when the filter is industry or M&A |
+| `diffbot-places` | `Place` + `City`/`Subregion`/`Region`/`Country` | narrowest subtype; no sort unless the ordering is the question |
+| `diffbot-deals` | `Investment` / `Transaction` | newest first by default (`revSortBy:investment.date`); routes to `Organization.investments` / `.acquiredBy` when the filter is industry or M&A |
 
 **organizations vs deals is settled by row shape**, not by subject matter: rows of
 companies → `diffbot-organizations`; rows of transactions/investments/deals →
@@ -61,9 +61,11 @@ return the unfiltered count, `type:Acquisition` records are name-only stubs,
 **Don't add a sort unless the ordering is the question.** For non-Article types the
 default ranking already encodes relevance/prominence, and an explicit sort overrides it
 — measurably for the worse (`homepageUri:"openai.com"` unsorted → OpenAI; with
-`revSortBy:nbEmployees` → "OpenAI for Developers"). Articles are the deliberate
-exception: `diffbot-news` defaults to `sortBy:date`. An earlier revision told three
-skills to "always add an explicit sort"; that was wrong and is corrected.
+`revSortBy:nbEmployees` → "OpenAI for Developers"). Articles and deals are the deliberate
+exceptions: `diffbot-news` defaults to `sortBy:date` and `diffbot-deals` to
+`revSortBy:investment.date`, matching the `search_news` and `search_deals` defaults in
+`diffbot-mcp` (Oct 2026). An earlier revision told three skills to "always add an
+explicit sort"; that was wrong and is corrected.
 
 **The default JSON export payload is not the full entity.** Many filterable fields —
 `Organization.ceo`/`.founders`, `Place.population`/`.isPartOf` — are simply absent
@@ -79,8 +81,10 @@ The competitor for a `url:` lookup is **the agent's own fetch tool** (`WebFetch`
 a browser tool), not `diffbot-extract`. `diffbot-web-search` is written that way on
 purpose — an earlier revision framed it as web-search vs. extract, which compares two
 Diffbot skills to each other and never reaches the decision the agent is actually making.
-Keep the built-in fetch as the named alternative in the description, the section heading,
-and the tips. `diffbot-extract` is the secondary note, not the headline.
+Keep the built-in fetch as the named alternative in the section heading and the tips.
+The frontmatter description was trimmed (Oct 2026) to the search claim, the `url:` +
+`-s full` claim, and a short trigger list; the fetch-vs-index rule lives in the body.
+`diffbot-extract` is the secondary note, not the headline.
 
 Querying with a `url:<URL>` prefix is an index lookup, not a retrieval. Verified live:
 

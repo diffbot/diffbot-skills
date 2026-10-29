@@ -1,6 +1,6 @@
 ---
 name: diffbot-dql
-description: "Query the Diffbot Knowledge Graph directly with DQL (Diffbot Query Language). The general-purpose layer beneath the entity-specific Diffbot skills — use it for any entity type or query shape they do not cover: products, patents, job posts, facet aggregations, ontology exploration, and cross-entity queries. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql"
+description: "Runs a raw DQL (Diffbot Query Language) query against the Diffbot Knowledge Graph. The general-purpose layer beneath the entity-specific Diffbot skills: use it for entity types and query shapes they do not cover, such as products, patents, job posts, facet aggregations, cross-entity queries, an id filter from entity resolution, or ontology lookups. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
@@ -65,7 +65,7 @@ type:Article quotes.speaker:"Donald Trump" sortBy:date
 
 Every DQL string starts with `type:`. Start with common types (`Organization`, `Person`, `Article`, `Product`) and reach for a more specific entity type via `dql ontology types` if those don't fit.
 
-**Look up fields before using them.** Independent ontology lookups should be issued as parallel Bash tool calls in a single Claude message so they don't queue.
+**Look up fields before using them.** An unknown field path is silently ignored (the query runs as if the clause were absent) and a guessed value returns zero, so confirm both with the ontology first. Independent ontology lookups should be issued as parallel Bash tool calls in a single Claude message so they don't queue.
 
 ```
 ~/.diffbot/venv/bin/db dql ontology fields Organization location     # entity-type fields, regex-filtered
@@ -212,7 +212,9 @@ Before running the final query, probe candidate variants for hit counts to verif
   'type:Organization descriptors:"GPU" location.country.name:"United States" isPublic:true'
 ```
 
-Output is a sorted text table of hit counts; add `--json` for machine-readable. This is the right way to test query selectivity — far faster than running them serially.
+Output is a sorted text table of hit counts; add `--json` for machine-readable. This is the right way to test query selectivity — far faster than running them serially. Read the counts against the bare `type:X` count: a variant that matches it exactly had a field path silently dropped, and zero means a wrong value. Never probe an unfiltered `type:Article`.
+
+**Do not add a sort unless the ordering is the question.** The default ranking already encodes relevance and prominence, and an explicit sort overrides it, usually for the worse. The exceptions are articles (`sortBy:date`) and deals (`revSortBy:investment.date`), which the `/diffbot-news` and `/diffbot-deals` skills apply by default.
 
 **Exception — `similarTo` queries cannot be probed.** `probe` requests `size=0`, and `similarTo` reports `hits` equal to the requested size, so it always returns `0` here no matter how good the query is. That `0` reads as "no matches" and is meaningless. Skip this step for `similarTo` and validate with `export --size 10`.
 

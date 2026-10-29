@@ -1,6 +1,6 @@
 ---
 name: diffbot-crawl
-description: "Crawl a website or manage Diffbot crawler jobs. Use when the user wants to crawl a site for structured content, list existing crawl jobs, or delete a crawl job. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl."
+description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: diffbot-deals
-description: "Search funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by date, deal size, round series, investor, acquirer, or industry — returns deals as rows: target, counterparty, amount, currency, date. MUST USE skill when the answer is a list of deals: deal flow, funding history for a company, or an investor's recent activity. Rows are deals, not companies. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
+description: "Funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by company, investor, acquirer, round series, amount, date, or the company's industry. MUST USE skill when the answer involves a list of investment deals: deal flow, a company's funding history, an investor's portfolio activity, M&A lists, or the largest deals in a period. Rows are investment deals. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
@@ -86,15 +86,19 @@ Without `{}` the clauses are independent — a company with *any* $50M round and
 
 Also on Organization: `investments` (full round history), `totalInvestment.value`, `nbUniqueInvestors`.
 
-**Sorting.** There *is* a useful default: unsorted, `investment.investors.name:"Sequoia
-Capital"` returns the headline rounds (OpenAI $122B, Anthropic $50B, OpenAI $40B),
-whereas `revSortBy:investment.date` returns whatever closed most recently regardless of
-size. Leave the sort off unless the ordering is the question, then use:
+**Sorting.** Deals default to **newest first**: append `revSortBy:investment.date` on
+`type:Investment`, `revSortBy:investments.date` when the query runs on the Organization
+side, and `sortBy:date` on `type:Transaction`. Unsorted, the ranking surfaces the headline
+rounds instead (`investment.investors.name:"Sequoia Capital"` → OpenAI $122B, Anthropic
+$50B, OpenAI $40B), which answers "biggest" rather than "recent"; when size is the
+question, say so with:
 
 ```
-revSortBy:investment.date        # newest rounds first
 revSortBy:investment.amount.value # largest rounds first
 ```
+
+This is the one deliberate exception, alongside `diffbot-news`, to the no-sort rule the
+other skills follow, and it matches `diffbot-mcp`'s `search_deals` default.
 
 #### Worked examples
 
@@ -104,7 +108,7 @@ type:Investment investment.series:"Series A" investment.date>="2026-01-01" revSo
 type:Investment investment.amount.value>100000000 investment.amount.currency:"USD" revSortBy:investment.date
 type:Investment investee.name:"OpenAI" revSortBy:investment.date
 type:Organization isAcquired:true acquiredBy.name:"Microsoft" revSortBy:acquiredBy.amount.value
-type:Organization categories.name:"Semiconductor Companies" investments.{amount.value>100000000 date>="2025-01-01"}
+type:Organization categories.name:"Semiconductor Companies" investments.{amount.value>100000000 date>="2025-01-01"} revSortBy:investments.date
 type:Transaction types:"Acquisition" sortBy:date
 ```
 

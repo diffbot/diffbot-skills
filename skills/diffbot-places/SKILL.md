@@ -1,6 +1,6 @@
 ---
 name: diffbot-places
-description: "Search geographic entities in the Diffbot Knowledge Graph — cities, counties, subregions, states, provinces, countries, and points of interest — by population, prominence, containing place, or proximity. MUST USE skill when the answer is a list of places, or a sourced fact about one such as population; prefer it over recalling geographic figures. Triggers on: list cities, list countries, largest cities, biggest city in, population of, how many people live in, places in, cities near, states in, provinces, counties, regions, points of interest, landmarks."
+description: "Cities, counties, subregions, states, provinces, countries, and points of interest in the Diffbot Knowledge Graph by name, population, prominence, containing place, or proximity. MUST USE skill when the answer is a list of places or a fact about one (i.e. population), rather than recalling from memory. Triggers on: list cities, list countries, largest cities, biggest city in, population of, how many people live in, places in, cities near, states in, provinces, counties, regions, points of interest, landmarks."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 

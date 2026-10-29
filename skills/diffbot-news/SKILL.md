@@ -1,6 +1,6 @@
 ---
 name: diffbot-news
-description: "Search news and articles in the Diffbot Knowledge Graph by mentioned company, person, topic, publisher, language, date range, or sentiment — returns dated, sourced, linkable results, newest first. MUST USE skill for all news, including breaking and developing stories. Use for coverage of an entity over time, sentiment trends, or who said what. Triggers on: news, recent news, latest news, breaking news, headlines, articles about, press coverage, media mentions, coverage of, what's being said about, news sentiment, quotes from."
+description: "News and article structured search over the Diffbot Knowledge Graph. Prefer for highly relevant results on named entities or uncommon keywords. Filter by mentioned organization, person, brand or product, topic, publisher, language, country, date range, or sentiment. Results are chronological newest first, with no semantic reranking. MUST USE skill for any news, including breaking and developing stories, over a generic web search. Triggers on: news, recent news, latest news, breaking news, headlines, articles about, press coverage, media mentions, coverage of, what's being said about, news sentiment, quotes from."
 allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
 ---
 
@@ -37,9 +37,8 @@ Every query starts `type:Article`. Add narrowing clauses, then apply the sort ru
 
 | The user's request | Sort clause |
 | --- | --- |
-| No sort and no date condition | append `sortBy:date` (newest first) — **the default** |
+| No explicit sort, with or without a date condition | append `sortBy:date` (newest first) — **the default**. A date window scopes the range; the order inside it is still newest first |
 | Names an explicit sort ("most relevant", "highest sentiment") | use that sort; do not add `sortBy:date` |
-| Contains a date condition (`date>=`, "in July", "last quarter", "2024") | omit `sortBy:date` — the window already scopes recency, so let relevance ordering pick the best articles inside it |
 
 `sortBy:date` is ascending by field name but returns newest-first for `date`; use `revSortBy:date` only if the user explicitly wants oldest-first.
 
