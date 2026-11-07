@@ -99,7 +99,7 @@ observation, not assumption:
 
 ## Dependency floor
 
-The Step 1 bootstrap in every skill pins `diffbot>=3.1.0` (at the time of this
+The install line in the README pins `diffbot>=3.1.0` (at the time of this
 capture, `diffbot-python>=0.2.1`; the package has since been renamed) rather than
 the bare package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
 when *any* version is already present, so a venv created against 0.1.0 would never
@@ -109,15 +109,31 @@ behaves as described.
 
 ## Permissions summary
 
-Each SKILL.md pre-authorizes only a fixed-path Bash allowlist:
+Each SKILL.md pre-authorizes only the exact `db` subcommands it runs, at the fixed
+path, plus `jq` where it pipes JSON. No shell, interpreter, or package manager is
+pre-authorized anywhere (changed in 1.2.1 — see below). The full set across all ten:
 
 ```
-Bash(~/.diffbot/venv/bin/db:*)
-Bash(python3 -m venv ~/.diffbot/venv:*)
-Bash(~/.diffbot/venv/bin/pip install:*)
-Bash(jq:*)              # Knowledge Graph skills only: diffbot-dql, -news,
-                        # -organizations, -people, -places, -deals
+Bash(~/.diffbot/venv/bin/db --version)            # all ten: the Step 1 CLI check
+Bash(~/.diffbot/venv/bin/db dql init)             # the six KG skills
+Bash(~/.diffbot/venv/bin/db dql ontology:*)       # dql, news, organizations, people
+Bash(~/.diffbot/venv/bin/db dql probe:*)          # the six KG skills
+Bash(~/.diffbot/venv/bin/db dql export:*)         # the six KG skills + entities
+Bash(~/.diffbot/venv/bin/db web-search:*)         # web-search, extract
+Bash(~/.diffbot/venv/bin/db extract:*)            # extract
+Bash(~/.diffbot/venv/bin/db entities:*)           # entities
+Bash(~/.diffbot/venv/bin/db crawl:*)              # crawl
+Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)    # crawl
+Bash(~/.diffbot/venv/bin/db crawl-delete-job:*)   # crawl
+Bash(jq:*)                                        # dql, news, people, deals
 ```
+
+**Changed in 1.2.1.** Through 1.2.0 each skill also pre-authorized
+`Bash(python3 -m venv ~/.diffbot/venv:*)`, `Bash(~/.diffbot/venv/bin/pip install:*)`, and
+`Bash(~/.diffbot/venv/bin/pip uninstall:*)`, and a Step 1 bootstrap ran them. Those three
+are gone from every allowlist and no skill installs, upgrades, or uninstalls anything.
+Installing the `db` CLI is a one-time user action documented in the README; a skill that
+finds the CLI missing stops and shows the user the line to run.
 
 No broad `Bash(*)`. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.

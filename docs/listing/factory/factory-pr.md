@@ -50,12 +50,12 @@ droid plugin install diffbot@factory-plugins
 ## Setup (user)
 
 - Diffbot API token at `~/.diffbot/credentials` ([get token](https://app.diffbot.com/get-started/))
-- Python 3.10+ — first skill run bootstraps `~/.diffbot/venv` and installs `diffbot` (formerly `diffbot-python`) from PyPI
+- Python 3.10+ — the user installs `diffbot` (formerly `diffbot-python`) from PyPI into `~/.diffbot/venv` once; the skills never install it themselves
 
 ## Security / audit notes
 
 - Skills-only plugin — no hooks, MCP servers, or bundled scripts
-- Each skill pre-authorizes a fixed-path Bash allowlist (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, `jq` on the KG skills)
+- Each skill pre-authorizes only the exact `db` subcommands it runs at the fixed path (e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`), plus `jq` on the four skills that pipe JSON through it. No shell, interpreter, or package manager is pre-approved
 - No secrets in repo; credentials user-managed
 
 ## Test plan

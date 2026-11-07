@@ -1,7 +1,7 @@
 ---
 name: diffbot-crawl
 description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*), Bash(~/.diffbot/venv/bin/db crawl-delete-job:*)
 ---
 
 # Diffbot Crawler
@@ -39,11 +39,24 @@ Crawl websites for structured content via the Diffbot Crawlbot API, and manage c
 
 ## Workflow
 
-### Step 1 — bootstrap
+### Step 1 — check the CLI
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
+~/.diffbot/venv/bin/db --version
 ```
+
+The `db` CLI is a one-time **user** install at `~/.diffbot/venv/bin/db`, the same way `gh` or
+`wrangler` is — **this skill never installs, upgrades, or uninstalls it.** If `--version`
+fails with `No such file or directory`, stop and show the user this line to run or approve
+themselves (it is deliberately not pre-approved):
+
+```
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
+user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+upgrade, or uninstall line yourself.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

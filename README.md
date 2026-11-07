@@ -27,8 +27,8 @@ npx skills add diffbot/diffbot-skills -g --all
 npx skills add diffbot/diffbot-skills -g -a claude-code -a cursor -a pi -y
 
 # Pin a release tag (git ref via URL or #fragment — @name selects a skill, not a tag)
-npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.2.0
-npx skills add diffbot/diffbot-skills#v1.2.0
+npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.2.1
+npx skills add diffbot/diffbot-skills#v1.2.1
 ```
 
 Supported agents include Claude Code, Cursor, GitHub Copilot, Codex, Pi, Factory (Droid), Snowflake Cortex Code, ForgeCode, Gemini CLI, OpenCode, and [many more](https://github.com/vercel-labs/skills#supported-agents). Discover packages at [skills.sh](https://skills.sh).
@@ -72,12 +72,12 @@ cortex plugin install diffbot/diffbot-skills
 Pin the release tag:
 
 ```bash
-cortex plugin install github:diffbot/diffbot-skills@v1.2.0
+cortex plugin install github:diffbot/diffbot-skills@v1.2.1
 ```
 
 #### Cortex Code Desktop
 
-Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.2.0` to pin the tag).
+Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.2.1` to pin the tag).
 
 ### Factory.ai (Droid)
 
@@ -126,7 +126,37 @@ Run this once on your machine (the skill will not write credentials for you):
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
 ```
 
-3. Invoke any skill — the first run bootstraps `~/.diffbot/venv` and installs [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.1.0) from PyPI, replacing an older `diffbot-python` install in the same venv if one is present.
+3. Install the `db` CLI once, into the virtualenv every skill reads:
+
+```bash
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+   This is a one-time user install, the same as putting `gh` or `wrangler` on your machine.
+   **The skills never install, upgrade, or uninstall it** — if the CLI is missing, a skill
+   stops and shows you this line to run or approve yourself. Verify with
+   `~/.diffbot/venv/bin/db --version`.
+
+4. Invoke any skill.
+
+### Upgrading the `db` CLI
+
+If a skill reports a version below 3.1.0, or `db` warns about the `diffbot-python` rename,
+upgrade in place:
+
+```bash
+~/.diffbot/venv/bin/pip install -U 'diffbot>=3.1.0'
+```
+
+The package was renamed from `diffbot-python` to [`diffbot`](https://pypi.org/project/diffbot/)
+at 3.0.0. If a leftover `diffbot-python` is still in the venv, remove it and reinstall — in
+this order, because uninstalling the shim deletes the shared module files and a plain
+install afterwards no-ops on the surviving dist-info:
+
+```bash
+~/.diffbot/venv/bin/pip uninstall -y diffbot-python
+~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.1.0'
+```
 
 ## Skills
 
@@ -264,14 +294,20 @@ This is structured knowledge querying — not page fetching, not generic web sea
 
 ## Requirements
 
-- **Python 3.10+** (used to bootstrap `~/.diffbot/venv`)
-- **`diffbot` >= 3.1.0** (formerly `diffbot-python`), installed automatically on first run
+- **Python 3.10+** (used to create `~/.diffbot/venv`)
+- **`diffbot` >= 3.1.0** (formerly `diffbot-python`), installed once by you — see [Setup](#setup)
 - **Diffbot API token** (free tier available)
 - A supported agent (see Install)
 
 ## Permissions
 
-Each skill pre-authorizes a minimal fixed-path Bash allowlist: `db`, venv creation, `pip install`, and `jq` (Knowledge Graph skills only). No broad `Bash(*)` grants. Credentials are user-managed at `~/.diffbot/credentials` and never stored in this repo.
+Each skill pre-authorizes only the exact `db` subcommands it runs — for example
+`Bash(~/.diffbot/venv/bin/db dql export:*)` — plus `jq` on the four skills that pipe JSON
+through it. No broad `Bash(*)` grants, and no shell, interpreter, or package manager is
+pre-authorized: `python3 -m venv`, `pip install`, and `pip uninstall` are deliberately
+**not** in any allowlist, so dependency installs and upgrades are always yours to run or
+approve. Credentials are user-managed at `~/.diffbot/credentials` and never stored in this
+repo.
 
 ## License
 

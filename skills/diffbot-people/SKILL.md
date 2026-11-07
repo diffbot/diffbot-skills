@@ -1,7 +1,7 @@
 ---
 name: diffbot-people
 description: "People structured search over the Diffbot Knowledge Graph. Prefer for leadership teams, executive and role lookups, alumni lists, skill-based sourcing, and profile facts on a named person. Filter by job title, employer, employer industry or size, school, major, skills, residence, nationality, or net worth. MUST USE skill when the answer is a list of people or involves structured people data. Covers people with a public online professional presence only, not a people-finder for private individuals. Triggers on: find people, who works at, executives at, employees of, CEO of, CTO of, leadership team, alumni of, people who studied, people with skill, board members, who founded."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*)
 ---
 
 # Diffbot People Search
@@ -21,14 +21,27 @@ these shapes.
 
 ## Workflow
 
-### Step 1 — bootstrap
+### Step 1 — check the CLI, then `db dql init`
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
+~/.diffbot/venv/bin/db --version
 ~/.diffbot/venv/bin/db dql init
 ```
 
-Guard the venv creation as shown — re-running `python3 -m venv` on an existing venv overwrites activation scripts. `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
+The `db` CLI is a one-time **user** install at `~/.diffbot/venv/bin/db`, the same way `gh` or
+`wrangler` is — **this skill never installs, upgrades, or uninstalls it.** If `--version`
+fails with `No such file or directory`, stop and show the user this line to run or approve
+themselves (it is deliberately not pre-approved):
+
+```
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
+user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+upgrade, or uninstall line yourself.
+
+`init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
 ```
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials

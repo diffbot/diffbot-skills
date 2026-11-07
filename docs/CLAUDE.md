@@ -131,12 +131,16 @@ the whole page; that predated the parameter. `diffbot-mcp`'s `search_web` sends
 `snippetLength=full rerank=none` on a bare `url:` query for the same reason.
 
 **Package name:** the CLI ships as `diffbot` on PyPI (3.x). `diffbot-python` is the old
-name; its final 0.3.0 is a shim that installs the same files and warns. The bootstrap
-line in every skill installs `diffbot>=3.1.0`, then uninstalls a leftover `diffbot-python`
-and force-reinstalls `diffbot` — in that order, because uninstalling the shim deletes the
-shared module files and a plain install afterwards no-ops on the surviving dist-info.
-The line is idempotent (~0.6 s on a migrated venv). `allowed-tools` carries
-`pip uninstall` for this; keep the two in sync.
+name; its final 0.3.0 is a shim that installs the same files and warns. The migration
+order matters — uninstall the leftover `diffbot-python` *first*, then force-reinstall
+`diffbot`, because uninstalling the shim deletes the shared module files and a plain
+install afterwards no-ops on the surviving dist-info.
+
+**As of 1.2.1 that migration lives in the README, not in a skill.** No skill installs,
+upgrades, or uninstalls anything any more (see [Permissions / deps](#permissions--deps)) —
+each one checks `db --version` and hands the user a line to run. Don't re-add a bootstrap
+step or a `pip` entry to `allowed-tools`: that pairing is exactly what the Anthropic
+directory held v1.2.0 for.
 
 Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
 repeat. An earlier revision of this file recorded a 30 s timeout returning nothing on that
@@ -285,7 +289,35 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 
 ## Permissions / deps
 
-- No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`
-  (fixed-path Bash allowlist only: `db`, `venv`, `pip install`, plus `jq` where used).
+- No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`.
+- **Each entry names one `db` subcommand at the fixed path, nothing broader**, e.g.
+  `Bash(~/.diffbot/venv/bin/db dql export:*)`. The two argument-free probes —
+  `db --version` and `db dql init` — carry no `:*` at all. `jq:*` is listed on the four
+  skills that actually pipe JSON through it (`dql`, `news`, `people`, `deals`) and nowhere
+  else. Adding a subcommand to a skill means adding its entry; dropping the last use of
+  one means removing the entry.
+- **Never pre-approve a shell, interpreter, or package manager.** `python3 -m venv`,
+  `pip install`, and `pip uninstall` were in the allowlist through v1.2.0 and are the
+  reason Anthropic's directory held it (`ALLOWED_TOOLS_BROAD`, 10 findings, plus 3
+  download-and-run findings). The portal holds a wildcard after any of those regardless of
+  path — `Bash(python3:*)` is the documented example.
+- **The `db` CLI is a user install, not a plugin install.** Every skill's Step 1 runs
+  `db --version`, and on failure prints the install line *for the user to run or approve*.
+  This is how a `gh`- or `wrangler`-based skill behaves, and it's the agreed shape — don't
+  "improve" the UX by auto-installing.
+- **The `~/` path form is deliberate.** Bash permission rules match the command text
+  literally (no tilde expansion), so the rule only fires if the skill writes the same
+  `~/.diffbot/venv/bin/db` string — hence the "always use the fixed path" instruction in
+  every skill. `~/` is a documented Claude Code path anchor, not a relative path, and the
+  entries carry no `..` and no wildcard inside the path. If the portal ever does hold the
+  form, the fallback is bare `Bash(db dql export:*)` with `db` on `PATH`, which gives up
+  the no-`PATH`-assumption guarantee.
 - Deps live in `~/.diffbot/venv` (stable path so the allowlist rule matches), not
   `${CLAUDE_PLUGIN_DATA}` (which `allowed-tools` can't variable-substitute).
+
+### Icon
+
+`.claude-plugin/icon.png` (1024x1024) is picked up by convention. **There is no `icon`
+field in the plugin manifest schema** — adding one makes
+`claude plugin validate --strict` fail with *"Unknown field 'icon'"*, which breaks CI.
+Verified against Claude Code 2.1.270.

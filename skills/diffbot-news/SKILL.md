@@ -1,7 +1,7 @@
 ---
 name: diffbot-news
 description: "News and article structured search over the Diffbot Knowledge Graph. Prefer for highly relevant results on named entities or uncommon keywords. Filter by mentioned organization, person, brand or product, topic, publisher, language, country, date range, or sentiment. Results are chronological newest first, with no semantic reranking. MUST USE skill for any news, including breaking and developing stories, over a generic web search. Triggers on: news, recent news, latest news, breaking news, headlines, articles about, press coverage, media mentions, coverage of, what's being said about, news sentiment, quotes from."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*)
 ---
 
 # Diffbot News Search
@@ -14,14 +14,27 @@ This is the skill for **all** news requests, breaking events included — the KG
 
 ## Workflow
 
-### Step 1 — bootstrap
+### Step 1 — check the CLI, then `db dql init`
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
+~/.diffbot/venv/bin/db --version
 ~/.diffbot/venv/bin/db dql init
 ```
 
-Guard the venv creation as shown — re-running `python3 -m venv` on an existing venv overwrites activation scripts. `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
+The `db` CLI is a one-time **user** install at `~/.diffbot/venv/bin/db`, the same way `gh` or
+`wrangler` is — **this skill never installs, upgrades, or uninstalls it.** If `--version`
+fails with `No such file or directory`, stop and show the user this line to run or approve
+themselves (it is deliberately not pre-approved):
+
+```
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
+user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+upgrade, or uninstall line yourself.
+
+`init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
 ```
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials

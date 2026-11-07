@@ -55,12 +55,15 @@ search.** No other marketplace plugin in the `development` category offers it.
 - **Skills-only repo** with per-tool manifests (`.claude-plugin/`, `.cortex-plugin/`,
   `.github/plugin/`, `.factory-plugin/`) — no `.agents/` symlinks, real files under
   `skills/`. Easy to audit.
-- Dependencies install to a dedicated venv at `~/.diffbot/venv` from PyPI
-  (`diffbot`, formerly `diffbot-python`). No vendored code.
-- **Minimal permissions:** each skill pre-authorizes only a fixed-path Bash allowlist
-  (`~/.diffbot/venv/bin/db`, venv creation, `pip install`, plus `jq` on the KG skills).
-  No broad `Bash(*)`. Credentials are user-managed at `~/.diffbot/credentials`,
-  never in the repo.
+- The `db` CLI is a one-time **user** install into a dedicated venv at
+  `~/.diffbot/venv` from PyPI (`diffbot`, formerly `diffbot-python`). No vendored code,
+  and no skill installs, upgrades, or uninstalls anything.
+- **Minimal permissions:** each skill pre-authorizes only the exact `db` subcommands it
+  runs at the fixed path (e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`), plus `jq` on
+  the four skills that pipe JSON through it. No broad `Bash(*)`, and no shell, interpreter,
+  or package manager — `python3 -m venv`, `pip install`, and `pip uninstall` are
+  deliberately not pre-approved. Credentials are user-managed at
+  `~/.diffbot/credentials`, never in the repo.
 
 ## Quality proof
 

@@ -1,7 +1,7 @@
 ---
 name: diffbot-entities
 description: "Named entity recognition and linking with the Diffbot NLP API. Finds people, organizations, places, and products mentioned in text. Each resolves to a Diffbot Knowledge Graph entity with confidence, salience, and sentiment. Prefer for post-processing plain text for entity mentions. `-f dql` emits an id:or(...) filter that fetches the full records; entities without an id were recognized but not matched. Triggers on: identify entities, entity recognition, NER, find entities in text, extract entities, entity linking, diffbot NLP, named entity."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db entities:*), Bash(~/.diffbot/venv/bin/db dql export:*)
 ---
 
 # Diffbot Entities (NLP)
@@ -26,11 +26,24 @@ Text can be passed as a CLI argument or piped via stdin.
 
 ## Workflow
 
-### Step 1 — bootstrap
+### Step 1 — check the CLI
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
+~/.diffbot/venv/bin/db --version
 ```
+
+The `db` CLI is a one-time **user** install at `~/.diffbot/venv/bin/db`, the same way `gh` or
+`wrangler` is — **this skill never installs, upgrades, or uninstalls it.** If `--version`
+fails with `No such file or directory`, stop and show the user this line to run or approve
+themselves (it is deliberately not pre-approved):
+
+```
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
+user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+upgrade, or uninstall line yourself.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

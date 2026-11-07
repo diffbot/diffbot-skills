@@ -1,7 +1,7 @@
 ---
 name: diffbot-dql
 description: "Runs a raw DQL (Diffbot Query Language) query against the Diffbot Knowledge Graph. The general-purpose layer beneath the entity-specific Diffbot skills: use it for entity types and query shapes they do not cover, such as products, patents, job posts, facet aggregations, cross-entity queries, an id filter from entity resolution, or ontology lookups. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql."
-allowed-tools: Bash(~/.diffbot/venv/bin/db:*), Bash(python3 -m venv ~/.diffbot/venv:*), Bash(~/.diffbot/venv/bin/pip install:*), Bash(~/.diffbot/venv/bin/pip uninstall:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*)
 ---
 
 # Diffbot Knowledge Graph Search (DQL)
@@ -12,7 +12,7 @@ Query the Diffbot Knowledge Graph via the DQL API. Translate the user's plain-te
 
 All work in this skill is driven by the `db` CLI from the [`diffbot`](https://github.com/diffbot/diffbot-python) library. It owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing.
 
-**The skill runs the CLI from a dedicated virtualenv it owns at `~/.diffbot/venv`** — it does not assume `db` is on `PATH` or that any other venv exists. The Step 1 bootstrap creates the venv and installs the library if missing. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`** — never bare `db` and never another venv's `db`, so the permission allow rule matches and no `PATH` assumption is made. Throughout this document `db` is shorthand for `~/.diffbot/venv/bin/db`; expand it to the full path in every actual bash command.
+**The CLI lives in a dedicated virtualenv at `~/.diffbot/venv`, which the user installs once** — the skill does not assume `db` is on `PATH` or that any other venv exists, and it never installs the library itself. Step 1 checks that the CLI is there. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`** — never bare `db` and never another venv's `db`, so the permission allow rule matches and no `PATH` assumption is made. Throughout this document `db` is shorthand for `~/.diffbot/venv/bin/db`; expand it to the full path in every actual bash command.
 
 ```
 ~/.diffbot/venv/bin/db dql init                              # refresh ontology cache; check credentials
@@ -34,14 +34,25 @@ Prefer `--out <file>` over stdout for anything but tiny result sets: use `probe`
 
 ## Workflow
 
-### Step 1 — bootstrap + `db dql init`
-
-First ensure the venv exists and the library is installed, then run `init`. Guard the venv creation so it only runs when the venv is missing — re-running `python3 -m venv` on an existing venv overwrites activation scripts and fails if any are read-only:
+### Step 1 — check the CLI, then `db dql init`
 
 ```
-[ -d ~/.diffbot/venv ] || python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install -q 'diffbot>=3.1.0' && { ~/.diffbot/venv/bin/pip uninstall -q -y diffbot-python 2>/dev/null && ~/.diffbot/venv/bin/pip install -q --force-reinstall --no-deps 'diffbot>=3.1.0'; true; }
+~/.diffbot/venv/bin/db --version
 ~/.diffbot/venv/bin/db dql init
 ```
+
+The `db` CLI is a one-time **user** install at `~/.diffbot/venv/bin/db`, the same way `gh` or
+`wrangler` is — **this skill never installs, upgrades, or uninstalls it.** If `--version`
+fails with `No such file or directory`, stop and show the user this line to run or approve
+themselves (it is deliberately not pre-approved):
+
+```
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+```
+
+If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
+user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+upgrade, or uninstall line yourself.
 
 `init` refreshes `~/.diffbot/ontology.json`, resets `~/.diffbot/tmp/`, and verifies a token is available. The token is read from the `DIFFBOT_API_TOKEN` environment variable if set, otherwise from `~/.diffbot/credentials`. If neither is present the user must run:
 
