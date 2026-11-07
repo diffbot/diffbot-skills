@@ -1,7 +1,7 @@
 ---
 name: diffbot-crawl
 description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*), Bash(~/.diffbot/venv/bin/db crawl-delete-job:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)
 ---
 
 # Diffbot Crawler
@@ -111,6 +111,10 @@ Delete a job:
 ```
 ~/.diffbot/venv/bin/db crawl-delete-job my-job-name
 ```
+
+Deleting a job is permanent on Diffbot's side, so `crawl-delete-job` is deliberately **not**
+pre-approved: Claude Code will ask the user to approve each deletion. Only run it when the
+user has asked to delete that specific job, and name the job when you do.
 
 ## Understanding crawl output
 

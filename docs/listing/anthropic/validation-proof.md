@@ -124,7 +124,6 @@ Bash(~/.diffbot/venv/bin/db extract:*)            # extract
 Bash(~/.diffbot/venv/bin/db entities:*)           # entities
 Bash(~/.diffbot/venv/bin/db crawl:*)              # crawl
 Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)    # crawl
-Bash(~/.diffbot/venv/bin/db crawl-delete-job:*)   # crawl
 Bash(jq:*)                                        # dql, news, people, deals
 ```
 
@@ -134,6 +133,9 @@ Bash(jq:*)                                        # dql, news, people, deals
 are gone from every allowlist and no skill installs, upgrades, or uninstalls anything.
 Installing the `db` CLI is a one-time user action documented in the README; a skill that
 finds the CLI missing stops and shows the user the line to run.
+
+`db crawl-delete-job` is used by the crawl skill but intentionally left out of its
+allowlist: deleting a crawl job is irreversible, so each deletion prompts the user.
 
 No broad `Bash(*)`. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.

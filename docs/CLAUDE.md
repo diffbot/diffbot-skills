@@ -296,6 +296,10 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
   skills that actually pipe JSON through it (`dql`, `news`, `people`, `deals`) and nowhere
   else. Adding a subcommand to a skill means adding its entry; dropping the last use of
   one means removing the entry.
+- **Destructive subcommands stay off the allowlist.** `db crawl-delete-job` is used by
+  `diffbot-crawl` but deliberately not pre-approved, so every deletion prompts the user.
+  Note that `Bash(... db crawl:*)` does not cover it: the rule needs a space after
+  `crawl`, so `crawl-delete-job` doesn't match.
 - **Never pre-approve a shell, interpreter, or package manager.** `python3 -m venv`,
   `pip install`, and `pip uninstall` were in the allowlist through v1.2.0 and are the
   reason Anthropic's directory held it (`ALLOWED_TOOLS_BROAD`, 10 findings, plus 3
