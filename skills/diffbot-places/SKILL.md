@@ -1,7 +1,7 @@
 ---
 name: diffbot-places
 description: "Cities, counties, subregions, states, provinces, countries, and points of interest in the Diffbot Knowledge Graph by name, population, prominence, containing place, or proximity. MUST USE skill when the answer is a list of places or a fact about one (i.e. population), rather than recalling from memory. Triggers on: list cities, list countries, largest cities, biggest city in, population of, how many people live in, places in, cities near, states in, provinces, counties, regions, points of interest, landmarks."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Place Search
@@ -34,6 +34,9 @@ If it prints a version below 3.1.0, fails with `No such option '--version'` (an 
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
+
+Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
+it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 

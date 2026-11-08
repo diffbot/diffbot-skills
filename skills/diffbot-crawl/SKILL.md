@@ -1,7 +1,7 @@
 ---
 name: diffbot-crawl
 description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*), Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Crawler
@@ -58,6 +58,9 @@ If it prints a version below 3.1.0, fails with `No such option '--version'` (an 
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
+
+Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
+it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

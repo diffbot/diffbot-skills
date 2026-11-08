@@ -1,7 +1,7 @@
 ---
 name: diffbot-news
 description: "News and article structured search over the Diffbot Knowledge Graph. Prefer for highly relevant results on named entities or uncommon keywords. Filter by mentioned organization, person, brand or product, topic, publisher, language, country, date range, or sentiment. Results are chronological newest first, with no semantic reranking. MUST USE skill for any news, including breaking and developing stories, over a generic web search. Triggers on: news, recent news, latest news, breaking news, headlines, articles about, press coverage, media mentions, coverage of, what's being said about, news sentiment, quotes from."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*), Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot News Search
@@ -34,6 +34,9 @@ If it prints a version below 3.1.0, fails with `No such option '--version'` (an 
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
+
+Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
+it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 

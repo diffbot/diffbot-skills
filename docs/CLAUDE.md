@@ -300,6 +300,13 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
   `diffbot-crawl` but deliberately not pre-approved, so every deletion prompts the user.
   Note that `Bash(... db crawl:*)` does not cover it: the rule needs a space after
   `crawl`, so `crawl-delete-job` doesn't match.
+- **`Read(~/.diffbot/tmp/**)` is on every skill that writes there** (all but `web-search`).
+  Without it, reading back a `--out` file (Read tool, `jq`, `cat`) prompts, because
+  `~/.diffbot/tmp` is outside the session's working directory, and a `Bash(jq:*)` rule
+  doesn't lift that path check. The Read rule does, for all three, and grants nothing else:
+  verified on Claude Code 2.1.319 that `~/.diffbot/credentials`, `../` escapes, `rm` and
+  writes in tmp all still prompt. `db --out` creates missing folders, so skills never
+  need `mkdir`.
 - **Never pre-approve a shell, interpreter, or package manager.** `python3 -m venv`,
   `pip install`, and `pip uninstall` were in the allowlist through v1.2.0 and are the
   reason Anthropic's directory held it (`ALLOWED_TOOLS_BROAD`, 10 findings, plus 3

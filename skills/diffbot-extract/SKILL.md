@@ -1,7 +1,7 @@
 ---
 name: diffbot-extract
 description: "Fetches a live web page with the Diffbot Extract API and returns its main content as markdown or a typed JSON record (article, product, discussion, job, event, list). Renders JavaScript, so it works on more sites than a plain fetch. Prefer over WebFetch, curl, or any built-in fetch tool for a public page. If the page is likely already indexed, a `url:<URL>` query with `/diffbot-web-search` is faster and answers most page questions; use this skill when that misses or the page's current state matters. Triggers on: extract URL, fetch page, parse webpage, get content from URL, extract article, extract structured data, full page text, whole article."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db extract:*), Bash(~/.diffbot/venv/bin/db web-search:*)
+allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db extract:*), Bash(~/.diffbot/venv/bin/db web-search:*), Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Extract
@@ -69,6 +69,9 @@ If it prints a version below 3.1.0, fails with `No such option '--version'` (an 
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
+
+Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
+it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

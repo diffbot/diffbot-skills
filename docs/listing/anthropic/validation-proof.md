@@ -125,6 +125,7 @@ Bash(~/.diffbot/venv/bin/db entities:*)           # entities
 Bash(~/.diffbot/venv/bin/db crawl:*)              # crawl
 Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)    # crawl
 Bash(jq:*)                                        # dql, news, people, deals
+Read(~/.diffbot/tmp/**)                           # all but web-search: read-only, scratch dir only
 ```
 
 **Changed in 1.2.1.** Through 1.2.0 each skill also pre-authorized
@@ -136,6 +137,10 @@ finds the CLI missing stops and shows the user the line to run.
 
 `db crawl-delete-job` is used by the crawl skill but intentionally left out of its
 allowlist: deleting a crawl job is irreversible, so each deletion prompts the user.
+
+`Read(~/.diffbot/tmp/**)` lets a skill read back the files `db` writes to its scratch
+directory (with Read, `jq` or `cat`). It grants no writes or deletes, and nothing else under
+`~/.diffbot` — `~/.diffbot/credentials` still needs approval, as does a `../` escape.
 
 No broad `Bash(*)`. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.
