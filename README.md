@@ -141,8 +141,9 @@ python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1
 
 ### Upgrading the `db` CLI
 
-If a skill reports a version below 3.1.0, or `db` warns about the `diffbot-python` rename,
-upgrade in place:
+If a skill reports a version below 3.1.0, `db --version` fails with `No such option
+'--version'` (an old `diffbot-python` install), or `db` warns about the `diffbot-python`
+rename, upgrade in place:
 
 ```bash
 ~/.diffbot/venv/bin/pip install -U 'diffbot>=3.1.0'

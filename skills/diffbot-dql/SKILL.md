@@ -50,8 +50,9 @@ themselves (it is deliberately not pre-approved):
 python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
 ```
 
-If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
-user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+`diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
+rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
 `init` refreshes `~/.diffbot/ontology.json`, resets `~/.diffbot/tmp/`, and verifies a token is available. The token is read from the `DIFFBOT_API_TOKEN` environment variable if set, otherwise from `~/.diffbot/credentials`. If neither is present the user must run:

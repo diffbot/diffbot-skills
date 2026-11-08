@@ -130,8 +130,9 @@ themselves (it is deliberately not pre-approved):
 python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
 ```
 
-If it prints a version below 3.1.0, or warns about the `diffbot-python` rename, point the
-user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
+If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+`diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
+rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
