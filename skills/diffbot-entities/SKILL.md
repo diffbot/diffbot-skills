@@ -1,7 +1,7 @@
 ---
 name: diffbot-entities
 description: "Named entity recognition and linking with the Diffbot NLP API. Finds people, organizations, places, and products mentioned in text. Each resolves to a Diffbot Knowledge Graph entity with confidence, salience, and sentiment. Prefer for post-processing plain text for entity mentions. `-f dql` emits an id:or(...) filter that fetches the full records; entities without an id were recognized but not matched. Triggers on: identify entities, entity recognition, NER, find entities in text, extract entities, entity linking, diffbot NLP, named entity."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db entities:*), Bash(~/.diffbot/venv/bin/db dql export:*), Read(~/.diffbot/tmp/**)
+allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Entities (NLP)
@@ -47,7 +47,7 @@ rename, point the user at **Upgrading the `db` CLI** in the plugin README and st
 upgrade, or uninstall line yourself.
 
 Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
+it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

@@ -35,7 +35,7 @@ We are asking for **discoverability** in the official marketplace (`cortex plugi
 
 ## Talking points (shared with Anthropic handoff)
 
-- Skills-only repo, per-tool manifests, minimal fixed-path `allowed-tools` — easy audit.
+- Skills-only repo, per-tool manifests, Read-only `allowed-tools` (`Read(~/.diffbot/tmp/**)` on nine skills; none on `diffbot-web-search`; `db` and `jq` prompt) — easy audit.
 - Dependencies: PyPI `diffbot` (formerly `diffbot-python`) into `~/.diffbot/venv`, installed once by the user; the skills never install it. No vendored code, no secrets in repo.
 - Never market as "web scraping" or generic "web search" — **structured web knowledge for developers**.
 

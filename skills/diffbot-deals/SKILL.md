@@ -1,7 +1,7 @@
 ---
 name: diffbot-deals
 description: "Funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by company, investor, acquirer, round series, amount, date, or the company's industry. MUST USE skill when the answer involves a list of investment deals: deal flow, a company's funding history, an investor's portfolio activity, M&A lists, or the largest deals in a period. Rows are investment deals. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Bash(jq:*), Read(~/.diffbot/tmp/**)
+allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Deal Search
@@ -36,7 +36,7 @@ rename, point the user at **Upgrading the `db` CLI** in the plugin README and st
 upgrade, or uninstall line yourself.
 
 Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
+it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 

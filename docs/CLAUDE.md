@@ -140,7 +140,9 @@ install afterwards no-ops on the surviving dist-info.
 upgrades, or uninstalls anything any more (see [Permissions / deps](#permissions--deps)) —
 each one checks `db --version` and hands the user a line to run. Don't re-add a bootstrap
 step or a `pip` entry to `allowed-tools`: that pairing is exactly what the Anthropic
-directory held v1.2.0 for.
+directory held v1.2.0 for. As of 1.2.2, don't re-add `Bash` or `jq` either — the directory
+accepts only `Read`, `Grep`, `Glob`, and `LS` from a non-Verified org, and this plugin
+uses only `Read`.
 
 Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
 repeat. An earlier revision of this file recorded a 30 s timeout returning nothing on that
@@ -290,45 +292,53 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 ## Permissions / deps
 
 - No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`.
-- **Each entry names one `db` subcommand at the fixed path, nothing broader**, e.g.
-  `Bash(~/.diffbot/venv/bin/db dql export:*)`. The two argument-free probes —
-  `db --version` and `db dql init` — carry no `:*` at all. `jq:*` is listed on the four
-  skills that actually pipe JSON through it (`dql`, `news`, `people`, `deals`) and nowhere
-  else. Adding a subcommand to a skill means adding its entry; dropping the last use of
-  one means removing the entry.
-- **Destructive subcommands stay off the allowlist.** `db crawl-delete-job` is used by
-  `diffbot-crawl` but deliberately not pre-approved, so every deletion prompts the user.
-  Note that `Bash(... db crawl:*)` does not cover it: the rule needs a space after
-  `crawl`, so `crawl-delete-job` doesn't match.
-- **`Read(~/.diffbot/tmp/**)` is on every skill that writes there** (all but `web-search`).
-  Without it, reading back a `--out` file (Read tool, `jq`, `cat`) prompts, because
-  `~/.diffbot/tmp` is outside the session's working directory, and a `Bash(jq:*)` rule
-  doesn't lift that path check. The Read rule does, for all three, and grants nothing else:
-  verified on Claude Code 2.1.319 that `~/.diffbot/credentials`, `../` escapes, `rm` and
-  writes in tmp all still prompt. `db --out` creates missing folders, so skills never
-  need `mkdir`.
+- **Verified-org rule (1.2.2).** The Anthropic plugin directory accepts `allowed-tools`
+  entries beyond `Read`, `Grep`, `Glob`, and `LS` only from Verified organizations.
+  Diffbot is not one. The Monday 2026-11-09 resubmission of the 1.2.1 tree was blocked
+  on that check. Do not re-add `Bash`, `jq`, or any other tool name, even narrowly scoped
+  to `db` or a fixed path. Do not add `Grep`, `Glob`, or `LS` just to fill a list. No
+  `${...}` paths, no paths starting with `//` or `\\`, no URLs.
+- **What each skill pre-approves now.** Nine skills list only `Read(~/.diffbot/tmp/**)`.
+  `diffbot-web-search` omits the `allowed-tools` key entirely — it does not read that
+  directory, and an empty list is worse than no key. Running `db` or `jq` prompts the
+  user. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
+  assumption). There is no Bash allow rule left for that string to match.
+- **1.2.1 history, superseded.** Each entry named one `db` subcommand at the fixed path,
+  e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`. The two argument-free probes —
+  `db --version` and `db dql init` — carried no `:*`. `jq:*` was listed on the four
+  skills that pipe JSON through it (`dql`, `news`, `people`, `deals`). That narrowing
+  cleared the v1.2.0 broad-shell hold. It does not pass the Verified-org check.
+- **Destructive subcommands stay off the allowlist.** `db crawl-delete-job` was already
+  absent in 1.2.1 — a `Bash(... db crawl:*)` rule needs a space after `crawl`, so
+  `crawl-delete-job` did not match — and it stays absent. Every `db` invocation prompts
+  now, deletion included. Only run it when the user has asked to delete that job.
+- **`Read(~/.diffbot/tmp/**)` stays on every skill that writes there** (all but
+  `web-search`). The path is not `${...}`, `//`, `\\`, or a URL, so the directory check
+  accepts it. Reading those files with the Read tool is pre-approved. `jq` and `cat`
+  are shell, so they prompt. `db --out` creates missing folders, so skills never need
+  `mkdir`. Verified on Claude Code 2.1.319, while a Bash allowlist still existed, that
+  `~/.diffbot/credentials`, `../` escapes, `rm`, and writes in tmp all still prompted.
 - **Never pre-approve a shell, interpreter, or package manager.** `python3 -m venv`,
   `pip install`, and `pip uninstall` were in the allowlist through v1.2.0 and are the
   reason Anthropic's directory held it (`ALLOWED_TOOLS_BROAD`, 10 findings, plus 3
-  download-and-run findings). The portal holds a wildcard after any of those regardless of
-  path — `Bash(python3:*)` is the documented example.
+  download-and-run findings). 1.2.1 removed those three. 1.2.2 removes Bash entirely.
+  Don't put any of them back.
 - **The `db` CLI is a user install, not a plugin install.** Every skill's Step 1 runs
-  `db --version`, and on failure prints the install line *for the user to run or approve*.
-  This is how a `gh`- or `wrangler`-based skill behaves, and it's the agreed shape — don't
-  "improve" the UX by auto-installing.
-- **The `~/` path form is deliberate.** Bash permission rules match the command text
-  literally (no tilde expansion), so the rule only fires if the skill writes the same
-  `~/.diffbot/venv/bin/db` string — hence the "always use the fixed path" instruction in
-  every skill. `~/` is a documented Claude Code path anchor, not a relative path, and the
-  entries carry no `..` and no wildcard inside the path. If the portal ever does hold the
-  form, the fallback is bare `Bash(db dql export:*)` with `db` on `PATH`, which gives up
-  the no-`PATH`-assumption guarantee.
-- Deps live in `~/.diffbot/venv` (stable path so the allowlist rule matches), not
-  `${CLAUDE_PLUGIN_DATA}` (which `allowed-tools` can't variable-substitute).
+  `db --version` (the user is prompted), and on failure prints the install line *for the
+  user to run or approve*. This is how a `gh`- or `wrangler`-based skill behaves — don't
+  "improve" the UX by auto-installing, and don't add a plugin-run bootstrap or a bundled
+  installer. The Step 1 `pip install` block and the README install / upgrade / `npx skills
+  add` sections are documentation for the user. The plugin does not execute them.
+- Deps live in `~/.diffbot/venv`, not `${CLAUDE_PLUGIN_DATA}` (`allowed-tools` can't
+  variable-substitute, and a `${...}` path fails the directory check).
 
 ### Icon
 
 `.claude-plugin/icon.png` (1024x1024) is picked up by convention. **There is no `icon`
 field in the plugin manifest schema** — adding one makes
 `claude plugin validate --strict` fail with *"Unknown field 'icon'"*, which breaks CI.
-Verified against Claude Code 2.1.270.
+Verified against Claude Code 2.1.270. Nothing in the plugin executes or loads that file
+(or any other image or font) as code — no hooks, scripts, commands, or skill instructions
+that interpret one as a program — so leave the icon in place. The 2026-11-09 directory
+warning about an image the plugin's code could run is this file; the scan already marked
+the icon itself Info/passed.

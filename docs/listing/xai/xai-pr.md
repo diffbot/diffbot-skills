@@ -40,7 +40,7 @@ Adds the **diffbot** plugin: ten skills for Diffbot's structured web knowledge A
   - `nl.diffbot.com` — entity recognition and linking (`/v1/`).
 - Credentials/permissions it requires (and why):
   - A Diffbot API token, read from `DIFFBOT_API_TOKEN` or `~/.diffbot/credentials`. The user writes that file; the skills never write credentials and are instructed never to echo the token. Free tier at https://app.diffbot.com/get-started/.
-  - Each SKILL.md pre-authorizes only the exact `db` subcommands it runs at the fixed path — e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)` — plus `jq` on the four skills that pipe JSON through it. No `Bash(*)`, and no shell, interpreter, or package manager: `python3 -m venv`, `pip install`, and `pip uninstall` are deliberately not pre-approved.
+  - As of 1.2.2 each SKILL.md's allowlist is Read-only. Nine skills pre-approve `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no `allowed-tools` key. `db` (always invoked at `~/.diffbot/venv/bin/db`) and `jq` prompt the user. No `Bash`, and no shell, interpreter, or package manager: `python3 -m venv`, `pip install`, and `pip uninstall` are not pre-approved. The Anthropic directory accepts tools beyond Read, Grep, Glob, and LS only from Verified orgs; Diffbot is not one.
 
 ## Notes for reviewers
 

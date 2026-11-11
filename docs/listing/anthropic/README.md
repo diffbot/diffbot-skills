@@ -49,3 +49,19 @@ Two useful notes from the portal's published rules
   none, so what made the old bootstrap a *plugin-run* command was the `allowed-tools`
   pre-approval sitting next to it. Removing the pre-approval is what breaks the pairing —
   see **Permissions / deps** in `docs/CLAUDE.md` before changing either half.
+
+## Directory review holds in v1.2.2
+
+The Monday 2026-11-09 resubmission was this same tree (v1.2.1, plus the Saturday
+`Read(~/.diffbot/tmp/**)` allowlist tweak). Nothing had landed on main since Saturday
+2026-11-07. Diffbot is not a Verified organization. The portal check is stricter than
+1.2.1's "scope each Bash entry to one subcommand" fix: `allowed-tools` entries beyond
+`Read`, `Grep`, `Glob`, and `LS` are accepted only from Verified orgs. Scoping
+`Bash(~/.diffbot/venv/bin/db dql export:*)` does not clear it. Do not put Bash back.
+
+| Finding | Count | What 1.2.2 did |
+| --- | --- | --- |
+| *BLOCKING: `allowed-tools` beyond Read, Grep, Glob, and LS* | every skill | `Bash` and `jq` removed from all ten. Nine skills keep only `Read(~/.diffbot/tmp/**)`. `diffbot-web-search` omits the `allowed-tools` key. No `${...}` paths, no `//` or `\\` paths, no URLs. `db` and `jq` prompt the user. |
+| *Pre-approves broad shell access (Bash)* | 10 | Resolved by the same Bash removal. |
+| *An image or font file the plugin's code could run* | 2 | Audited, files left as-is. The only image or font in the tree is `.claude-plugin/icon.png`, which the report already marked Info/passed. No hooks, scripts, commands, or skill instructions load or execute an image or font as code. No `icon` field added — it is not in the schema and `claude plugin validate --strict` fails on it. |
+| *Download-and-run commands* (`curl \| sh`, `uvx`/`npx` of a remote URL, `pip install` from a URL) | 3 | Left as documentation. The plugin itself does not run them: there is no hook, script, command, or `` !`…` `` line, and no bundled installer was added. The README install / upgrade / `npx skills add` sections stay. Each skill's Step 1 block still shows `python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'` for the user to run or approve, and still says the skill never installs, upgrades, or uninstalls the CLI. 1.2.1's note that installing was "documented in the README only" was incomplete — the line also lives in those Step 1 blocks, as documentation. |

@@ -1,7 +1,7 @@
 ---
 name: diffbot-organizations
 description: "Company and organization structured search over the Diffbot Knowledge Graph. Prefer for prospect lists, market maps, competitor sets, and firmographic facts on a market or a named company, plus similarTo lookalike lists. Filter by industry, location, headcount, revenue, founding date, public status, founder, investor, acquirer, or parent company. MUST USE skill when the answer is a list of companies or involves structured company data. Rows are companies, not deals. Triggers on: find companies, list companies, search companies, competitors of, companies like, startups in, firms, vendors of, suppliers of, customers of, market map, prospect list, companies by industry, look up."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db dql init), Bash(~/.diffbot/venv/bin/db dql ontology:*), Bash(~/.diffbot/venv/bin/db dql probe:*), Bash(~/.diffbot/venv/bin/db dql export:*), Read(~/.diffbot/tmp/**)
+allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Organization Search
@@ -36,7 +36,7 @@ rename, point the user at **Upgrading the `db` CLI** in the plugin README and st
 upgrade, or uninstall line yourself.
 
 Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
+it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 

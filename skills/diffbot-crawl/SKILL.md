@@ -1,7 +1,7 @@
 ---
 name: diffbot-crawl
 description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
-allowed-tools: Bash(~/.diffbot/venv/bin/db --version), Bash(~/.diffbot/venv/bin/db crawl:*), Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*), Read(~/.diffbot/tmp/**)
+allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Crawler
@@ -60,7 +60,7 @@ rename, point the user at **Upgrading the `db` CLI** in the plugin README and st
 upgrade, or uninstall line yourself.
 
 Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there (with Read, `jq` or `cat`) is pre-approved.
+it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 
@@ -116,8 +116,8 @@ Delete a job:
 ~/.diffbot/venv/bin/db crawl-delete-job my-job-name
 ```
 
-Deleting a job is permanent on Diffbot's side, so `crawl-delete-job` is deliberately **not**
-pre-approved: Claude Code will ask the user to approve each deletion. Only run it when the
+Deleting a job is permanent on Diffbot's side. `crawl-delete-job` is not pre-approved:
+Claude Code asks before every `db` command, including each deletion. Only run it when the
 user has asked to delete that specific job, and name the job when you do.
 
 ## Understanding crawl output

@@ -109,9 +109,21 @@ behaves as described.
 
 ## Permissions summary
 
-Each SKILL.md pre-authorizes only the exact `db` subcommands it runs, at the fixed
-path, plus `jq` where it pipes JSON. No shell, interpreter, or package manager is
-pre-authorized anywhere (changed in 1.2.1 — see below). The full set across all ten:
+As of 1.2.2 the directory accepts `allowed-tools` beyond `Read`, `Grep`, `Glob`, and
+`LS` only from Verified organizations. Diffbot is not one, so Bash and `jq` are gone
+from every allowlist. The user is prompted for `db` and `jq`. Skills still invoke `db`
+at `~/.diffbot/venv/bin/db`.
+
+Nine skills pre-approve only:
+
+```
+Read(~/.diffbot/tmp/**)    # all but web-search: read-only, scratch dir only
+```
+
+`diffbot-web-search` has no `allowed-tools` key.
+
+**1.2.1 history.** That release pre-authorized one `db` subcommand per entry at the
+fixed path, plus `jq:*` on `dql`, `news`, `people`, and `deals`:
 
 ```
 Bash(~/.diffbot/venv/bin/db --version)            # all ten: the Step 1 CLI check
@@ -125,22 +137,23 @@ Bash(~/.diffbot/venv/bin/db entities:*)           # entities
 Bash(~/.diffbot/venv/bin/db crawl:*)              # crawl
 Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)    # crawl
 Bash(jq:*)                                        # dql, news, people, deals
-Read(~/.diffbot/tmp/**)                           # all but web-search: read-only, scratch dir only
+Read(~/.diffbot/tmp/**)                           # all but web-search
 ```
 
-**Changed in 1.2.1.** Through 1.2.0 each skill also pre-authorized
+**Changed in 1.2.1** (relative to 1.2.0). Through 1.2.0 each skill also pre-authorized
 `Bash(python3 -m venv ~/.diffbot/venv:*)`, `Bash(~/.diffbot/venv/bin/pip install:*)`, and
 `Bash(~/.diffbot/venv/bin/pip uninstall:*)`, and a Step 1 bootstrap ran them. Those three
-are gone from every allowlist and no skill installs, upgrades, or uninstalls anything.
-Installing the `db` CLI is a one-time user action documented in the README; a skill that
-finds the CLI missing stops and shows the user the line to run.
+were removed then, and no skill installs, upgrades, or uninstalls anything. Installing
+the `db` CLI is a one-time user action; a skill that finds the CLI missing stops and
+shows the user the line to run. 1.2.2 then removed the remaining Bash and `jq` entries.
 
-`db crawl-delete-job` is used by the crawl skill but intentionally left out of its
-allowlist: deleting a crawl job is irreversible, so each deletion prompts the user.
+`db crawl-delete-job` stays off the allowlist. Deleting a crawl job is irreversible, so
+each deletion prompts the user — as does every other `db` command.
 
 `Read(~/.diffbot/tmp/**)` lets a skill read back the files `db` writes to its scratch
-directory (with Read, `jq` or `cat`). It grants no writes or deletes, and nothing else under
-`~/.diffbot` — `~/.diffbot/credentials` still needs approval, as does a `../` escape.
+directory with the Read tool. `jq` and `cat` prompt. The rule grants no writes or
+deletes, and nothing else under `~/.diffbot` — `~/.diffbot/credentials` still needs
+approval, as does a `../` escape.
 
-No broad `Bash(*)`. No plugin `settings.json`. Credentials are user-managed at
+No Bash entries. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.

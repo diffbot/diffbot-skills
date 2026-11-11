@@ -55,7 +55,7 @@ droid plugin install diffbot@factory-plugins
 ## Security / audit notes
 
 - Skills-only plugin — no hooks, MCP servers, or bundled scripts
-- Each skill pre-authorizes only the exact `db` subcommands it runs at the fixed path (e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`), plus `jq` on the four skills that pipe JSON through it. No shell, interpreter, or package manager is pre-approved
+- Each skill's allowlist is Read-only. Nine skills pre-approve `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no `allowed-tools` key. `db` and `jq` prompt the user. No shell, interpreter, or package manager is pre-approved
 - No secrets in repo; credentials user-managed
 
 ## Test plan

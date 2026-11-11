@@ -39,7 +39,7 @@ Pattern matches firecrawl's entry in `anthropics/claude-plugins-official`
 
 - **DQL is the headline** — ontology-aware KG querying, unique in the
   `development` category. Don't frame as scraping/search.
-- Skills-only repo, per-tool manifests, minimal fixed-path permissions — easy audit.
+- Skills-only repo, per-tool manifests, Read-only permissions (`db` and `jq` prompt) — easy audit.
 - `claude plugin validate` passes; `/diffbot-dql` completes a real KG query E2E.
 
 ## Post-listing

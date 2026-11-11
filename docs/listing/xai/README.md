@@ -28,7 +28,7 @@ Inside Grok Build run `/marketplace`, find **diffbot**, and press `i` to install
 
 **Maintenance:** a remote source means no second copy of `skills/` anywhere — but the catalog is frozen at the pinned commit. To ship a release to Grok Build users, open a PR that bumps the `sha` in `.grok-plugin/marketplace.json` and regenerates the index. xAI also runs a daily `bump-plugin-shas` workflow that advances pins when the manifest `version` changes, so bump `version` in all five manifests on every release.
 
-**Review expectations** (from their CONTRIBUTING): source under the official org (`diffbot/`, not a personal account); `keywords`/`domains` must be brand-scoped because they drive the plugin CTA — generic terms like `search`, `crawl`, `api` get pushed back; static security audit of skills, hooks, and MCP configs. This plugin is skills-only with a fixed-path Bash allowlist and no hooks or MCP servers, which keeps that audit short.
+**Review expectations** (from their CONTRIBUTING): source under the official org (`diffbot/`, not a personal account); `keywords`/`domains` must be brand-scoped because they drive the plugin CTA — generic terms like `search`, `crawl`, `api` get pushed back; static security audit of skills, hooks, and MCP configs. This plugin is skills-only with a Read-only allowlist (no Bash; `db` and `jq` prompt) and no hooks or MCP servers, which keeps that audit short.
 
 **Category:** `development` — the same category as the other web-data plugins in the catalog (firecrawl, exa, tavily). Their catalog has no `research` category.
 

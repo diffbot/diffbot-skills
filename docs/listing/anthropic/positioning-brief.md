@@ -58,12 +58,13 @@ search.** No other marketplace plugin in the `development` category offers it.
 - The `db` CLI is a one-time **user** install into a dedicated venv at
   `~/.diffbot/venv` from PyPI (`diffbot`, formerly `diffbot-python`). No vendored code,
   and no skill installs, upgrades, or uninstalls anything.
-- **Minimal permissions:** each skill pre-authorizes only the exact `db` subcommands it
-  runs at the fixed path (e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`), plus `jq` on
-  the four skills that pipe JSON through it. No broad `Bash(*)`, and no shell, interpreter,
-  or package manager — `python3 -m venv`, `pip install`, and `pip uninstall` are
-  deliberately not pre-approved. Credentials are user-managed at
-  `~/.diffbot/credentials`, never in the repo.
+- **Minimal permissions (1.2.2):** the directory accepts tools beyond Read, Grep, Glob,
+  and LS only from Verified organizations, and Diffbot is not one. Nine skills
+  pre-approve only `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no allowlist.
+  `db` and `jq` prompt. No shell, interpreter, or package manager is pre-approved —
+  `python3 -m venv`, `pip install`, and `pip uninstall` stay off the allowlist, and Bash
+  is gone entirely. Credentials are user-managed at `~/.diffbot/credentials`, never in
+  the repo.
 
 ## Quality proof
 
