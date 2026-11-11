@@ -298,6 +298,24 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
   on that check. Do not re-add `Bash`, `jq`, or any other tool name, even narrowly scoped
   to `db` or a fixed path. Do not add `Grep`, `Glob`, or `LS` just to fill a list. No
   `${...}` paths, no paths starting with `//` or `\\`, no URLs.
+- **CI enforces the Verified-org rule.** `.github/workflows/directory-policy.yml`
+  runs `scripts/check-directory-policy.py` on pull requests into `main` and on
+  pushes to `main`. No secrets and no schedule. The script fails the build when
+  any `allowed-tools` or `allowedTools` on the plugin surface — skill frontmatter,
+  commands, agents, `plugin.json`, `settings.json`, hooks — names a tool other
+  than `Read`, `Grep`, `Glob`, or `LS` (those names are case-sensitive), or carries
+  a `${...}` path, a path starting with `//` or `\\`, or a URL. It also fails when
+  a hook command, a `` !`…` `` line, or an allowlist entry would run a
+  download-and-run install (`curl` or `wget` piped to a shell, `pip install` /
+  `pip uninstall`, or `npx` / `uvx` of an http(s) URL). Docs-only `pip` fences in
+  `SKILL.md` and `README.md`, and the README `npx skills add` line, stay; they are
+  user documentation. Historical write-ups under `docs/listing/` are not plugin
+  surface. GitHub-hosted runners do not have the `claude` CLI, so the workflow
+  skips `claude plugin validate --strict` there instead of installing it. The
+  developer portal may still warn on resubmit about those docs-only pip lines and
+  about the plugin icon. The two image findings were likely a false positive on
+  `.claude-plugin/icon.png`, which that report already marked Info/passed. This
+  check does not submit the plugin.
 - **What each skill pre-approves now.** Nine skills list only `Read(~/.diffbot/tmp/**)`.
   `diffbot-web-search` omits the `allowed-tools` key entirely — it does not read that
   directory, and an empty list is worse than no key. Running `db` or `jq` prompts the
