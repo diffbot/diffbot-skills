@@ -68,10 +68,16 @@ The Monday 2026-11-09 resubmission was this same tree (v1.2.1, plus the Saturday
 
 ## Directory-policy CI
 
-`.github/workflows/directory-policy.yml` runs `scripts/check-directory-policy.py`
-on pull requests into `main` and on pushes to `main`. Diffbot is not a Verified
-org, so the script fails if any plugin-surface `allowed-tools` / `allowedTools`
-(skill frontmatter, commands, agents, `plugin.json`, `settings.json`, hooks)
+`.github/workflows/directory-policy.yml` runs the check **inline** — a
+`python3 - <<'PY'` heredoc in its `Check directory allowlist policy` step — on
+pull requests into `main` and on pushes to `main`. It is inline rather than a
+`scripts/` file because the directory scans `main` and a non-Verified org may
+ship only Markdown, text, JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images there;
+scripts, shebang files, and package-manager configs are refused. Workflow files
+are not plugin surface, so the guard is unchanged: twelve self-test cases run
+first (all in temporary directories), then the live checkout. Diffbot is not a
+Verified org, so the check fails if any plugin-surface `allowed-tools` /
+`allowedTools` (skill frontmatter, commands, agents, `plugin.json`, `settings.json`, hooks)
 names a tool other than `Read`, `Grep`, `Glob`, or `LS`, or contains a `${...}`
 path, a path starting with `//` or `\\`, or a URL. `Bash` and `jq` cannot come
 back without failing CI. Docs-only `pip install` / `pip uninstall` / upgrade

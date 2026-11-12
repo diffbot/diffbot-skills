@@ -160,8 +160,16 @@ No Bash entries. No plugin `settings.json`. Credentials are user-managed at
 
 ## Directory-policy CI (added after 1.2.2)
 
-`scripts/check-directory-policy.py`, run by `.github/workflows/directory-policy.yml`
-on pull requests into `main` and pushes to `main`, fails the build if a
+The check lives **inline** in `.github/workflows/directory-policy.yml`, as a
+`python3 - <<'PY'` heredoc in its `Check directory allowlist policy` step, and
+runs on pull requests into `main` and pushes to `main`. It was a standalone
+`scripts/check-directory-policy.py` until 2026-11-12, when the directory scan
+refused `main` over it: a non-Verified org may ship only Markdown, text, JSON,
+YAML, and PNG/JPEG/GIF/WebP/ICO images, so a script or shebang file is rejected
+regardless of what it does, and the directory follows `main`. Workflow files are
+not plugin surface. The logic moved verbatim — twelve self-test cases in
+temporary directories, then the live checkout (rooted at `$GITHUB_WORKSPACE`,
+which has no `__file__` to walk up from) — and still fails the build if a
 plugin-surface allowlist (`allowed-tools` / `allowedTools` in skill frontmatter,
 commands, agents, `plugin.json`, `settings.json`, or hooks) names anything other
 than `Read`, `Grep`, `Glob`, or `LS`, or uses a `${...}` path, a `//` or `\\`

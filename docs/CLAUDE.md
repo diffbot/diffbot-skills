@@ -231,8 +231,10 @@ different place; keep all five plugin manifests in sync (name, version, descript
   the SKILL.md files into `.forge/skills/`. (Don't confuse with Atlassian Forge or claude-forge — unrelated.)
 - **Cowork** is served by a **separate branch** — `cowork`, which carries `scripts/`
   (bundling tooling) and `vendor/` (the `db` CLI plus its pinned dependency closure) on top
-  of `main`. Cowork's sandbox blocks PyPI, so its zip must ship the CLI inside it; every
-  install path on `main` bootstraps `~/.diffbot/venv` from PyPI instead and never reads
+  of `main`. That `scripts/` directory exists only on `cowork`; `main` ships no scripts at
+  all, because the Anthropic directory refuses them from a non-Verified org. Cowork's
+  sandbox blocks PyPI, so its zip must ship the CLI inside it; every install path on
+  `main` bootstraps `~/.diffbot/venv` from PyPI instead and never reads
   `vendor/`. Keeping those ~9.6 MB off `main` matters because `npx skills`, the plugin
   marketplaces, and the Git clone path all download the repo. `vendor/` is in `.gitignore`
   here so a rebase can't quietly reintroduce it — **don't "fix" that by untracking it on
@@ -299,9 +301,18 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
   to `db` or a fixed path. Do not add `Grep`, `Glob`, or `LS` just to fill a list. No
   `${...}` paths, no paths starting with `//` or `\\`, no URLs.
 - **CI enforces the Verified-org rule.** `.github/workflows/directory-policy.yml`
-  runs `scripts/check-directory-policy.py` on pull requests into `main` and on
-  pushes to `main`. No secrets and no schedule. The script fails the build when
-  any `allowed-tools` or `allowedTools` on the plugin surface — skill frontmatter,
+  carries the check **inline**, as a `python3 - <<'PY'` heredoc in its
+  `Check directory allowlist policy` step, and runs it on pull requests into
+  `main` and on pushes to `main`. No secrets and no schedule. There is no
+  `scripts/` directory on `main` and a standalone checker cannot live here: the
+  directory scans `main`, and a non-Verified org may ship only Markdown, text,
+  JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images — a script, a shebang file, or a
+  package-manager config is refused outright. (That refusal is what removed
+  `scripts/check-directory-policy.py` on 2026-11-12.) Workflow files are not
+  plugin surface, so the guard runs from there unchanged. Edit the heredoc, not
+  a script; its first twelve self-test cases must still pass before the live
+  tree is scanned. The check fails the build when any `allowed-tools` or
+  `allowedTools` on the plugin surface — skill frontmatter,
   commands, agents, `plugin.json`, `settings.json`, hooks — names a tool other
   than `Read`, `Grep`, `Glob`, or `LS` (those names are case-sensitive), or carries
   a `${...}` path, a path starting with `//` or `\\`, or a URL. It also fails when
