@@ -158,32 +158,23 @@ approval, as does a `../` escape.
 No Bash entries. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.
 
-## Directory-policy CI (added after 1.2.2)
+## Staying within directory policy (after 1.2.2)
 
-The check lives **inline** in `.github/workflows/directory-policy.yml`, as a
-`python3 - <<'PY'` heredoc in its `Check directory allowlist policy` step, and
-runs on pull requests into `main` and pushes to `main`. It was a standalone
-`scripts/check-directory-policy.py` until 2026-11-12, when the directory scan
-refused `main` over it: a non-Verified org may ship only Markdown, text, JSON,
-YAML, and PNG/JPEG/GIF/WebP/ICO images, so a script or shebang file is rejected
-regardless of what it does, and the directory follows `main`. Workflow files are
-not plugin surface. The logic moved verbatim — twelve self-test cases in
-temporary directories, then the live checkout (rooted at `$GITHUB_WORKSPACE`,
-which has no `__file__` to walk up from) — and still fails the build if a
-plugin-surface allowlist (`allowed-tools` / `allowedTools` in skill frontmatter,
-commands, agents, `plugin.json`, `settings.json`, or hooks) names anything other
-than `Read`, `Grep`, `Glob`, or `LS`, or uses a `${...}` path, a `//` or `\\`
-path, or a URL. The same check fails on an executed download-and-run install: a
-hook command, a `` !`…` `` line, or an allowlist entry that runs `curl` / `wget`
-piped to a shell, `pip install` / `pip uninstall`, or `npx` / `uvx` of an http(s)
-URL. Docs-only `pip` fences in `SKILL.md` and `README.md`, the README
-`npx skills add` line, and historical quotations in this directory are not
-executable plugin surface, so they do not fail the check. The workflow skips
-`claude plugin validate --strict` when the CLI is not installed; it does not
-install Claude.
+These rules are written down, not automated. **Shipping criteria (Anthropic
+plugin directory)** in `docs/CLAUDE.md` holds the current, authoritative list —
+the `Read` / `Grep` / `Glob` / `LS` allowlist rule with its `${...}`, `//`,
+`\\`, and URL path bans; the file-type rule, which applies to `main` and not
+just the release tag; the line between a documented install command and an
+executable one (a hook, a `` !`…` `` line, an allowlist entry); the icon rule;
+and a pre-push checklist. Diffbot is not a Verified org, so every one of them
+has to hold before anything lands on `main`, and the person making the change is
+the one who checks. A CI guard for this was tried in Nov 2026 — briefly as a
+`scripts/` script, which the directory itself refused on the file-type rule,
+then inlined in a workflow — and was removed in favor of the written criteria.
 
-This CI check does not clear the developer portal. On resubmit the portal may
-still warn about those docs-only pip lines and about the plugin icon. The two
-image findings were likely a false positive on `.claude-plugin/icon.png`, which
-the same report already marked Info/passed. Do not add an `icon` field. Andrew's
-contact still has to resubmit; nothing here submits the plugin to Anthropic.
+Nothing in this repository clears the developer portal. On resubmit the portal
+may still warn about the docs-only pip lines and about the plugin icon; neither
+is a blocker. The two image findings were likely a false positive on
+`.claude-plugin/icon.png`, which the same report already marked Info/passed. Do
+not add an `icon` field. Andrew's contact still has to resubmit; nothing here
+submits the plugin to Anthropic.

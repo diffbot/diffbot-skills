@@ -213,10 +213,10 @@ different place; keep all five plugin manifests in sync (name, version, descript
     already-running session. The README says to restart; keep that note.
 - Validate before release: `claude plugin validate .` checks `marketplace.json` when present, and
   `claude plugin validate .claude-plugin/plugin.json` checks the plugin manifest. `--strict` turns
-  warnings into a non-zero exit for CI.
+  warnings into a non-zero exit, which is what you want on the pre-push run.
 - **This file lives at `docs/CLAUDE.md`, not the repo root — keep it there.** At the root it
   tripped the only `--strict` warning (*"CLAUDE.md at the plugin root is not loaded as project
-  context"*), which blocked a green CI run. Moving it clears that.
+  context"*), so the tree could not validate cleanly. Moving it clears that.
   - The tradeoff, so nobody "restores" it by accident: a root `CLAUDE.md` is auto-loaded as
     project context when someone opens this repo to work on it; `docs/CLAUDE.md` is not — it
     loads only when the agent is working inside `docs/`. Read it explicitly before editing
@@ -291,47 +291,76 @@ dropping it to regain the `diffbot:` auto-prefix would break that install path o
 
 If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 
+## Shipping criteria (Anthropic plugin directory)
+
+Read this before changing anything on the plugin surface. **Diffbot is not a Verified
+Anthropic organization**, and nothing in this repo enforces the rules below — there is no
+CI check, no hook, no linter. Whoever makes the change is responsible for meeting every
+one of them before it lands on `main`.
+
+**Allowlists.** `allowed-tools` / `allowedTools` anywhere on the plugin surface — skill
+frontmatter, commands, agents, `plugin.json`, `settings.json`, hooks — may name only
+`Read`, `Grep`, `Glob`, or `LS`. Those names are case-sensitive: `read` is not `Read`.
+Never re-add `Bash`, `jq`, or any other tool name, not even narrowly scoped to one `db`
+subcommand at a fixed path — that narrowing is exactly what failed in 1.2.2. No `${...}`
+paths, no paths starting with `//` or `\\`, no URLs. Today nine skills keep only
+`Read(~/.diffbot/tmp/**)`, `diffbot-web-search` omits the key entirely, and `db` and `jq`
+prompt the user.
+
+**File types.** The directory scans `main`, not just the release tag, so a file that
+would be refused cannot sit on `main` even temporarily. A non-Verified org may ship only
+Markdown, text, JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images. No scripts, no programs, no
+shebang (`#!`) files, no package-manager config files. `LICENSE`, `README`, `.gitignore`,
+and the plugin icon may stay. So no `scripts/*.py`, no `*.sh`, nothing with a shebang on
+`main` — not even a helper only this repo would ever run. The `cowork` branch carries its
+own `scripts/` and `vendor/` deliberately; don't port that onto `main`, and don't "fix"
+`cowork` from `main`.
+
+**Install lines.** Documented `pip` / `npx` / venv install lines in `SKILL.md` and the
+README are allowed and stay — they are documentation for the user to run, and the plugin
+never executes them. What is forbidden is download-and-run in anything executable:
+`curl | sh`, `pip install` / `pip uninstall`, or `npx` / `uvx` of a URL inside a hook
+command, a `` !`…` `` line, or an allowlist entry. Historical allowlist quotations under
+`docs/listing/` are not plugin surface either.
+
+**Icon.** Keep `.claude-plugin/icon.png` — it is picked up by convention. Never add an
+`icon` field to `plugin.json`: `claude plugin validate --strict` fails on it. See
+[Icon](#icon).
+
+**Not blockers.** The developer portal warns about the docs-only download-and-run lines
+and about image/font files the plugin "could run". Neither is a hold. Don't strip the
+install documentation or delete the icon to chase an all-green report.
+
+**Before pushing to `main`:**
+
+1. Grep every allowlist on the plugin surface; confirm each entry is `Read`, `Grep`,
+   `Glob`, or `LS`, with no `${...}`, `//`, `\\`, or URL in its path.
+2. `git ls-tree -r --name-only HEAD` — no `.py`, no `.sh`, no other script, no shebang
+   file anywhere in the tree.
+3. No download-and-run in a hook, a `` !`…` `` line, or an allowlist entry.
+4. `claude plugin validate . --strict` and
+   `claude plugin validate .claude-plugin/plugin.json --strict`, if the CLI is available
+   locally.
+5. All five manifests in sync on `name`, `version`, `description`, and `license`.
+
+A CI guard for these rules was tried in Nov 2026 — first as
+`scripts/check-directory-policy.py`, which the directory refused because a script on
+`main` fails the file-type rule, then inlined as a heredoc in
+`.github/workflows/directory-policy.yml` — and was removed in favor of these written
+criteria.
+
 ## Permissions / deps
 
 - No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`.
-- **Verified-org rule (1.2.2).** The Anthropic plugin directory accepts `allowed-tools`
-  entries beyond `Read`, `Grep`, `Glob`, and `LS` only from Verified organizations.
-  Diffbot is not one. The Monday 2026-11-09 resubmission of the 1.2.1 tree was blocked
-  on that check. Do not re-add `Bash`, `jq`, or any other tool name, even narrowly scoped
-  to `db` or a fixed path. Do not add `Grep`, `Glob`, or `LS` just to fill a list. No
-  `${...}` paths, no paths starting with `//` or `\\`, no URLs.
-- **CI enforces the Verified-org rule.** `.github/workflows/directory-policy.yml`
-  carries the check **inline**, as a `python3 - <<'PY'` heredoc in its
-  `Check directory allowlist policy` step, and runs it on pull requests into
-  `main` and on pushes to `main`. No secrets and no schedule. There is no
-  `scripts/` directory on `main` and a standalone checker cannot live here: the
-  directory scans `main`, and a non-Verified org may ship only Markdown, text,
-  JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images — a script, a shebang file, or a
-  package-manager config is refused outright. (That refusal is what removed
-  `scripts/check-directory-policy.py` on 2026-11-12.) Workflow files are not
-  plugin surface, so the guard runs from there unchanged. Edit the heredoc, not
-  a script; its first twelve self-test cases must still pass before the live
-  tree is scanned. The check fails the build when any `allowed-tools` or
-  `allowedTools` on the plugin surface — skill frontmatter,
-  commands, agents, `plugin.json`, `settings.json`, hooks — names a tool other
-  than `Read`, `Grep`, `Glob`, or `LS` (those names are case-sensitive), or carries
-  a `${...}` path, a path starting with `//` or `\\`, or a URL. It also fails when
-  a hook command, a `` !`…` `` line, or an allowlist entry would run a
-  download-and-run install (`curl` or `wget` piped to a shell, `pip install` /
-  `pip uninstall`, or `npx` / `uvx` of an http(s) URL). Docs-only `pip` fences in
-  `SKILL.md` and `README.md`, and the README `npx skills add` line, stay; they are
-  user documentation. Historical write-ups under `docs/listing/` are not plugin
-  surface. GitHub-hosted runners do not have the `claude` CLI, so the workflow
-  skips `claude plugin validate --strict` there instead of installing it. The
-  developer portal may still warn on resubmit about those docs-only pip lines and
-  about the plugin icon. The two image findings were likely a false positive on
-  `.claude-plugin/icon.png`, which that report already marked Info/passed. This
-  check does not submit the plugin.
-- **What each skill pre-approves now.** Nine skills list only `Read(~/.diffbot/tmp/**)`.
-  `diffbot-web-search` omits the `allowed-tools` key entirely — it does not read that
-  directory, and an empty list is worse than no key. Running `db` or `jq` prompts the
-  user. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
-  assumption). There is no Bash allow rule left for that string to match.
+- **Verified-org rule (1.2.2), history.** The Monday 2026-11-09 resubmission of the 1.2.1
+  tree was blocked on the directory's allowlist check, which is stricter than 1.2.1's
+  "scope each `Bash` entry to one subcommand" fix. The rule itself is above under
+  [Shipping criteria](#shipping-criteria-anthropic-plugin-directory). One addition: do not
+  add `Grep`, `Glob`, or `LS` just to fill a list — list only what a skill actually uses.
+- **What each skill pre-approves now.** `diffbot-web-search` omits the `allowed-tools` key
+  entirely — it does not read the scratch directory, and an empty list is worse than no
+  key. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
+  assumption); there is no Bash allow rule left for that string to match.
 - **1.2.1 history, superseded.** Each entry named one `db` subcommand at the fixed path,
   e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`. The two argument-free probes —
   `db --version` and `db dql init` — carried no `:*`. `jq:*` was listed on the four
@@ -365,7 +394,7 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 
 `.claude-plugin/icon.png` (1024x1024) is picked up by convention. **There is no `icon`
 field in the plugin manifest schema** — adding one makes
-`claude plugin validate --strict` fail with *"Unknown field 'icon'"*, which breaks CI.
+`claude plugin validate --strict` fail with *"Unknown field 'icon'"*.
 Verified against Claude Code 2.1.270. Nothing in the plugin executes or loads that file
 (or any other image or font) as code — no hooks, scripts, commands, or skill instructions
 that interpret one as a program — so leave the icon in place. The 2026-11-09 directory

@@ -66,31 +66,21 @@ The Monday 2026-11-09 resubmission was this same tree (v1.2.1, plus the Saturday
 | *An image or font file the plugin's code could run* | 2 | Audited, files left as-is. The only image or font in the tree is `.claude-plugin/icon.png`, which the report already marked Info/passed. No hooks, scripts, commands, or skill instructions load or execute an image or font as code. No `icon` field added — it is not in the schema and `claude plugin validate --strict` fails on it. |
 | *Download-and-run commands* (`curl \| sh`, `uvx`/`npx` of a remote URL, `pip install` from a URL) | 3 | Left as documentation. The plugin itself does not run them: there is no hook, script, command, or `` !`…` `` line, and no bundled installer was added. The README install / upgrade / `npx skills add` sections stay. Each skill's Step 1 block still shows `python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'` for the user to run or approve, and still says the skill never installs, upgrades, or uninstalls the CLI. 1.2.1's note that installing was "documented in the README only" was incomplete — the line also lives in those Step 1 blocks, as documentation. |
 
-## Directory-policy CI
+## Keeping the tree shippable
 
-`.github/workflows/directory-policy.yml` runs the check **inline** — a
-`python3 - <<'PY'` heredoc in its `Check directory allowlist policy` step — on
-pull requests into `main` and on pushes to `main`. It is inline rather than a
-`scripts/` file because the directory scans `main` and a non-Verified org may
-ship only Markdown, text, JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images there;
-scripts, shebang files, and package-manager configs are refused. Workflow files
-are not plugin surface, so the guard is unchanged: twelve self-test cases run
-first (all in temporary directories), then the live checkout. Diffbot is not a
-Verified org, so the check fails if any plugin-surface `allowed-tools` /
-`allowedTools` (skill frontmatter, commands, agents, `plugin.json`, `settings.json`, hooks)
-names a tool other than `Read`, `Grep`, `Glob`, or `LS`, or contains a `${...}`
-path, a path starting with `//` or `\\`, or a URL. `Bash` and `jq` cannot come
-back without failing CI. Docs-only `pip install` / `pip uninstall` / upgrade
-fences in `SKILL.md` and `README.md`, and the README
-`npx skills add https://github.com/...` line, stay — they are user documentation,
-not something the plugin runs. A hook command, a `` !`…` `` line, or an allowlist
-that runs a download-and-run install still fails. Notes under `docs/listing/` are
-not scanned as plugin surface. The workflow does not install the Claude CLI; if
-`claude` is absent it skips `claude plugin validate --strict`.
+Nothing in this repository enforces the directory's rules — no CI job, no hook,
+no linter. **Shipping criteria (Anthropic plugin directory)** in `docs/CLAUDE.md`
+is the authority: the allowlist rule (`Read`, `Grep`, `Glob`, `LS` only, no
+`${...}` / `//` / `\\` / URL paths), the file-type rule on `main`, which install
+lines are documentation and which would be executable, the icon rule, and a
+pre-push checklist. Read it before touching skill frontmatter, a manifest, or
+anything else on the plugin surface; whoever makes the change is responsible for
+meeting the criteria. A CI guard was tried in Nov 2026 and removed in favor of
+those written criteria.
 
-The portal may still warn about those docs-only pip lines and about the required
+The portal may still warn about the docs-only pip lines and about the required
 plugin icon. The two image findings were likely a false positive on
 `.claude-plugin/icon.png`, which the same report already marked Info/passed.
-Those warnings are not cleared by this check. No `icon` field was added
-(`claude plugin validate --strict` rejects it). Andrew's contact still has to
-resubmit; this repository does not submit the plugin.
+Neither is a blocker, and neither is cleared by anything in this repository. No
+`icon` field was added (`claude plugin validate --strict` rejects it). Andrew's
+contact still has to resubmit; this repository does not submit the plugin.
