@@ -160,17 +160,10 @@ No Bash entries. No plugin `settings.json`. Credentials are user-managed at
 
 ## Staying within directory policy (after 1.2.2)
 
-These rules are written down, not automated. **Shipping criteria (Anthropic
-plugin directory)** in `docs/CLAUDE.md` holds the current, authoritative list —
-the `Read` / `Grep` / `Glob` / `LS` allowlist rule with its `${...}`, `//`,
-`\\`, and URL path bans; the file-type rule, which applies to `main` and not
-just the release tag; the line between a documented install command and an
-executable one (a hook, a `` !`…` `` line, an allowlist entry); the icon rule;
-and a pre-push checklist. Diffbot is not a Verified org, so every one of them
-has to hold before anything lands on `main`, and the person making the change is
-the one who checks. A CI guard for this was tried in Nov 2026 — briefly as a
-`scripts/` script, which the directory itself refused on the file-type rule,
-then inlined in a workflow — and was removed in favor of the written criteria.
+These rules are written down, not automated. `AGENTS.md` at the repo root
+describes the criteria the directory has applied to this plugin. Diffbot is not a
+Verified org, so every one of them has to hold before anything lands on `main`,
+and the person making the change is the one who checks.
 
 Nothing in this repository clears the developer portal. On resubmit the portal
 may still warn about the docs-only pip lines and about the plugin icon; neither

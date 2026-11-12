@@ -69,14 +69,10 @@ The Monday 2026-11-09 resubmission was this same tree (v1.2.1, plus the Saturday
 ## Keeping the tree shippable
 
 Nothing in this repository enforces the directory's rules — no CI job, no hook,
-no linter. **Shipping criteria (Anthropic plugin directory)** in `docs/CLAUDE.md`
-is the authority: the allowlist rule (`Read`, `Grep`, `Glob`, `LS` only, no
-`${...}` / `//` / `\\` / URL paths), the file-type rule on `main`, which install
-lines are documentation and which would be executable, the icon rule, and a
-pre-push checklist. Read it before touching skill frontmatter, a manifest, or
+no linter. `AGENTS.md` at the repo root describes the criteria the directory has
+applied to this plugin. Read it before touching skill frontmatter, a manifest, or
 anything else on the plugin surface; whoever makes the change is responsible for
-meeting the criteria. A CI guard was tried in Nov 2026 and removed in favor of
-those written criteria.
+meeting the criteria.
 
 The portal may still warn about the docs-only pip lines and about the required
 plugin icon. The two image findings were likely a false positive on

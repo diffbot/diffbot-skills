@@ -9,6 +9,10 @@ Distributed two ways from the same `skills/` tree:
 2. **Plugin manifests** — marketplace / native plugin install on Claude Code, Grok Build,
    Copilot, Cortex Code, and Factory (Droid)
 
+The Anthropic plugin-directory criteria this repo must meet — what the directory
+refuses, what it only warns about — are described in [`AGENTS.md`](../AGENTS.md) at the
+repo root. Read it before changing anything on the plugin surface.
+
 ## Skill layering
 
 `diffbot-dql` is the general-purpose escape hatch — powerful but too broad for
@@ -140,9 +144,8 @@ install afterwards no-ops on the surviving dist-info.
 upgrades, or uninstalls anything any more (see [Permissions / deps](#permissions--deps)) —
 each one checks `db --version` and hands the user a line to run. Don't re-add a bootstrap
 step or a `pip` entry to `allowed-tools`: that pairing is exactly what the Anthropic
-directory held v1.2.0 for. As of 1.2.2, don't re-add `Bash` or `jq` either — the directory
-accepts only `Read`, `Grep`, `Glob`, and `LS` from a non-Verified org, and this plugin
-uses only `Read`.
+directory held v1.2.0 for. As of 1.2.2 the allowlists name only `Read` — see
+[`AGENTS.md`](../AGENTS.md) for the directory criteria behind that.
 
 Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
 repeat. An earlier revision of this file recorded a 30 s timeout returning nothing on that
@@ -291,72 +294,14 @@ dropping it to regain the `diffbot:` auto-prefix would break that install path o
 
 If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 
-## Shipping criteria (Anthropic plugin directory)
-
-Read this before changing anything on the plugin surface. **Diffbot is not a Verified
-Anthropic organization**, and nothing in this repo enforces the rules below — there is no
-CI check, no hook, no linter. Whoever makes the change is responsible for meeting every
-one of them before it lands on `main`.
-
-**Allowlists.** `allowed-tools` / `allowedTools` anywhere on the plugin surface — skill
-frontmatter, commands, agents, `plugin.json`, `settings.json`, hooks — may name only
-`Read`, `Grep`, `Glob`, or `LS`. Those names are case-sensitive: `read` is not `Read`.
-Never re-add `Bash`, `jq`, or any other tool name, not even narrowly scoped to one `db`
-subcommand at a fixed path — that narrowing is exactly what failed in 1.2.2. No `${...}`
-paths, no paths starting with `//` or `\\`, no URLs. Today nine skills keep only
-`Read(~/.diffbot/tmp/**)`, `diffbot-web-search` omits the key entirely, and `db` and `jq`
-prompt the user.
-
-**File types.** The directory scans `main`, not just the release tag, so a file that
-would be refused cannot sit on `main` even temporarily. A non-Verified org may ship only
-Markdown, text, JSON, YAML, and PNG/JPEG/GIF/WebP/ICO images. No scripts, no programs, no
-shebang (`#!`) files, no package-manager config files. `LICENSE`, `README`, `.gitignore`,
-and the plugin icon may stay. So no `scripts/*.py`, no `*.sh`, nothing with a shebang on
-`main` — not even a helper only this repo would ever run. The `cowork` branch carries its
-own `scripts/` and `vendor/` deliberately; don't port that onto `main`, and don't "fix"
-`cowork` from `main`.
-
-**Install lines.** Documented `pip` / `npx` / venv install lines in `SKILL.md` and the
-README are allowed and stay — they are documentation for the user to run, and the plugin
-never executes them. What is forbidden is download-and-run in anything executable:
-`curl | sh`, `pip install` / `pip uninstall`, or `npx` / `uvx` of a URL inside a hook
-command, a `` !`…` `` line, or an allowlist entry. Historical allowlist quotations under
-`docs/listing/` are not plugin surface either.
-
-**Icon.** Keep `.claude-plugin/icon.png` — it is picked up by convention. Never add an
-`icon` field to `plugin.json`: `claude plugin validate --strict` fails on it. See
-[Icon](#icon).
-
-**Not blockers.** The developer portal warns about the docs-only download-and-run lines
-and about image/font files the plugin "could run". Neither is a hold. Don't strip the
-install documentation or delete the icon to chase an all-green report.
-
-**Before pushing to `main`:**
-
-1. Grep every allowlist on the plugin surface; confirm each entry is `Read`, `Grep`,
-   `Glob`, or `LS`, with no `${...}`, `//`, `\\`, or URL in its path.
-2. `git ls-tree -r --name-only HEAD` — no `.py`, no `.sh`, no other script, no shebang
-   file anywhere in the tree.
-3. No download-and-run in a hook, a `` !`…` `` line, or an allowlist entry.
-4. `claude plugin validate . --strict` and
-   `claude plugin validate .claude-plugin/plugin.json --strict`, if the CLI is available
-   locally.
-5. All five manifests in sync on `name`, `version`, `description`, and `license`.
-
-A CI guard for these rules was tried in Nov 2026 — first as
-`scripts/check-directory-policy.py`, which the directory refused because a script on
-`main` fails the file-type rule, then inlined as a heredoc in
-`.github/workflows/directory-policy.yml` — and was removed in favor of these written
-criteria.
-
 ## Permissions / deps
 
 - No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`.
 - **Verified-org rule (1.2.2), history.** The Monday 2026-11-09 resubmission of the 1.2.1
   tree was blocked on the directory's allowlist check, which is stricter than 1.2.1's
-  "scope each `Bash` entry to one subcommand" fix. The rule itself is above under
-  [Shipping criteria](#shipping-criteria-anthropic-plugin-directory). One addition: do not
-  add `Grep`, `Glob`, or `LS` just to fill a list — list only what a skill actually uses.
+  "scope each `Bash` entry to one subcommand" fix. The rule itself is described in
+  [`AGENTS.md`](../AGENTS.md). One addition of our own: do not add `Grep`, `Glob`, or `LS`
+  just to fill a list — list only what a skill actually uses.
 - **What each skill pre-approves now.** `diffbot-web-search` omits the `allowed-tools` key
   entirely — it does not read the scratch directory, and an empty list is worse than no
   key. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
