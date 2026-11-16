@@ -1,7 +1,6 @@
 ---
 name: diffbot-entities
 description: "Named entity recognition and linking with the Diffbot NLP API. Finds people, organizations, places, and products mentioned in text. Each resolves to a Diffbot Knowledge Graph entity with confidence, salience, and sentiment. Prefer for post-processing plain text for entity mentions. `-f dql` emits an id:or(...) filter that fetches the full records; entities without an id were recognized but not matched. Triggers on: identify entities, entity recognition, NER, find entities in text, extract entities, entity linking, diffbot NLP, named entity."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Entities (NLP)
@@ -38,16 +37,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them. Always tell the user where an export was saved.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 
@@ -86,7 +85,7 @@ The `-f dql` format emits an `id:or(...)` filter string that can be piped direct
 ~/.diffbot/venv/bin/db entities "Apple, Microsoft, and Google dominate cloud AI." -f dql \
   | xargs -I{} ~/.diffbot/venv/bin/db dql export "{}" \
       --spec "name,Name;nbEmployees,Employees;homepageUri,Website" \
-      --out ~/.diffbot/tmp/entities.csv
+      --out .diffbot/tmp/entities.csv
 ```
 
 This is a fast path for turning free text into structured KG lookups — much faster than a name-based DQL query because ID lookups bypass full-text search.

@@ -7,8 +7,9 @@ to this plugin, as reported back to us by the Anthropic developer portal. It is 
 description of the feedback we have, not a procedure — it says what the directory accepts and
 refuses, and leaves how to satisfy it to whoever makes the change.
 
-Everything here comes from two portal results: a directory check of the resubmitted
-1.2.1 tree (commit `70fd1db`) and a later scheduled check of v1.2.2. Nothing below is
+Everything here comes from three portal results: a directory check of the resubmitted
+1.2.1 tree (commit `70fd1db`), a later scheduled check of v1.2.2, and a refusal after
+v1.2.2 of the `allowed-tools` lists that version still carried. Nothing below is
 inferred beyond those.
 
 ## Two facts that frame all of it
@@ -34,7 +35,16 @@ entries naming any tool beyond `Read`, `Grep`, `Glob`, and `LS` are accepted onl
 Verified organizations.
 
 1.2.1's approach — a `Bash` entry scoped to a single `db` subcommand — did not satisfy
-this. This blocker was cleared in 1.2.2, and the v1.2.2 scan recorded those as fixed.
+this. 1.2.2 removed `Bash`, and the v1.2.2 scan recorded those entries as fixed.
+
+That did not clear the rule. 1.2.2 kept a `Read` entry scoped to a folder in the user's
+home directory, and the next result refused it: one of the four accepted tools counts as
+beyond them when its path starts with `//` or `\\`, is a URL, uses `${...}`, or points
+outside the project and the plugin. A tool list the directory cannot read completely is
+refused the same way. The portal's instruction was to cut each list to `Read`, `Grep`,
+`Glob`, and `LS` with no such path.
+
+As of 1.2.3 no skill has an `allowed-tools` key.
 
 ### Files outside the allowed types
 

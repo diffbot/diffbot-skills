@@ -55,7 +55,7 @@ droid plugin install diffbot@factory-plugins
 ## Security / audit notes
 
 - Skills-only plugin — no hooks, MCP servers, or bundled scripts
-- Each skill's allowlist is Read-only. Nine skills pre-approve `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no `allowed-tools` key. `db` and `jq` prompt the user. No shell, interpreter, or package manager is pre-approved
+- No skill has an `allowed-tools` key, so nothing is pre-approved. Exports are saved to `.diffbot/tmp/` in the working directory. `db` and `jq` prompt the user. No shell, interpreter, or package manager is pre-approved
 - No secrets in repo; credentials user-managed
 
 ## Test plan

@@ -1,7 +1,6 @@
 ---
 name: diffbot-people
 description: "People structured search over the Diffbot Knowledge Graph. Prefer for leadership teams, executive and role lookups, alumni lists, skill-based sourcing, and profile facts on a named person. Filter by job title, employer, employer industry or size, school, major, skills, residence, nationality, or net worth. MUST USE skill when the answer is a list of people or involves structured people data. Covers people with a public online professional presence only, not a people-finder for private individuals. Triggers on: find people, who works at, executives at, employees of, CEO of, CTO of, leadership team, alumni of, people who studied, people with skill, board members, who founded."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot People Search
@@ -34,16 +33,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
@@ -157,7 +156,7 @@ rejected, so fix the bad clause and re-run.
 ### Step 5 — export and display
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/people.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/people.csv \
   --spec "name,Name;employments.title,Title;employments.employer.name,Employer;location.city.name,City;linkedInUri,LinkedIn" \
   --size 50
 ```
@@ -183,7 +182,7 @@ rejected, so fix the bad clause and re-run.
   All three genuinely co-founded Tesla; none of those employers is Tesla. Don't present
   the rendered employer as the matched one. Export JSON and pick the right entry:
   ```bash
-  jq -r '.data[].entity | .name as $n | .employments[] | select(.employer.name|test("Tesla")) | "\($n)\t\(.title)\t\(.employer.name)"' ~/.diffbot/tmp/people.json
+  jq -r '.data[].entity | .name as $n | .employments[] | select(.employer.name|test("Tesla")) | "\($n)\t\(.title)\t\(.employer.name)"' .diffbot/tmp/people.json
   ```
 - **`descriptors` is effectively unpopulated on Person** (`descriptors:"venture
   capitalist"` → 0 hits), unlike Organization where it is a good fallback. Use
@@ -209,7 +208,7 @@ rejected, so fix the bad clause and re-run.
   in same-named companies (a Person scan for Tesla founders surfaced the *band* Tesla's
   guitarist). Note `get:` is required — these fields are absent from the default payload:
   ```
-  ~/.diffbot/venv/bin/db dql export 'type:Organization homepageUri:"tesla.com" get:name,ceo,founders' --out ~/.diffbot/tmp/f.json --format json --size 1
+  ~/.diffbot/venv/bin/db dql export 'type:Organization homepageUri:"tesla.com" get:name,ceo,founders' --out .diffbot/tmp/f.json --format json --size 1
   ```
   Returns `ceo=Elon Musk`, `founders=JB Straubel, Martin Eberhard, Ian Wright, Marc
   Tarpenning, Elon Musk`.

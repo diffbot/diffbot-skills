@@ -144,7 +144,7 @@ install afterwards no-ops on the surviving dist-info.
 upgrades, or uninstalls anything any more (see [Permissions / deps](#permissions--deps)) —
 each one checks `db --version` and hands the user a line to run. Don't re-add a bootstrap
 step or a `pip` entry to `allowed-tools`: that pairing is exactly what the Anthropic
-directory held v1.2.0 for. As of 1.2.2 the allowlists name only `Read` — see
+directory held v1.2.0 for. As of 1.2.3 no skill has an allowlist — see
 [`AGENTS.md`](../AGENTS.md) for the directory criteria behind that.
 
 Extract timings for context: 1.3 s–9 s typical, 24 s cold on the docs page and 0.8 s on a
@@ -296,15 +296,14 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
 
 ## Permissions / deps
 
-- No plugin `settings.json` — permissions live in each SKILL.md's `allowed-tools`.
+- No plugin `settings.json`, and as of 1.2.3 no SKILL.md has an `allowed-tools` key.
 - **Verified-org rule (1.2.2), history.** The Monday 2026-11-09 resubmission of the 1.2.1
   tree was blocked on the directory's allowlist check, which is stricter than 1.2.1's
   "scope each `Bash` entry to one subcommand" fix. The rule itself is described in
   [`AGENTS.md`](../AGENTS.md). One addition of our own: do not add `Grep`, `Glob`, or `LS`
   just to fill a list — list only what a skill actually uses.
-- **What each skill pre-approves now.** `diffbot-web-search` omits the `allowed-tools` key
-  entirely — it does not read the scratch directory, and an empty list is worse than no
-  key. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
+- **What each skill pre-approves now: nothing.** Every skill omits the `allowed-tools` key
+  entirely — an empty list is worse than no key. Skills still invoke `db` at the fixed path `~/.diffbot/venv/bin/db` (no `PATH`
   assumption); there is no Bash allow rule left for that string to match.
 - **1.2.1 history, superseded.** Each entry named one `db` subcommand at the fixed path,
   e.g. `Bash(~/.diffbot/venv/bin/db dql export:*)`. The two argument-free probes —
@@ -315,12 +314,15 @@ If you add a skill, prefix it `diffbot-` and keep the dir name == `name:` field.
   absent in 1.2.1 — a `Bash(... db crawl:*)` rule needs a space after `crawl`, so
   `crawl-delete-job` did not match — and it stays absent. Every `db` invocation prompts
   now, deletion included. Only run it when the user has asked to delete that job.
-- **`Read(~/.diffbot/tmp/**)` stays on every skill that writes there** (all but
-  `web-search`). The path is not `${...}`, `//`, `\\`, or a URL, so the directory check
-  accepts it. Reading those files with the Read tool is pre-approved. `jq` and `cat`
-  are shell, so they prompt. `db --out` creates missing folders, so skills never need
-  `mkdir`. Verified on Claude Code 2.1.319, while a Bash allowlist still existed, that
-  `~/.diffbot/credentials`, `../` escapes, `rm`, and writes in tmp all still prompted.
+- **Exports go to `.diffbot/tmp/` in the working directory (1.2.3).** Through 1.2.2 nine
+  skills pre-approved `Read` on a scratch folder under `~/.diffbot`. The directory
+  refused that: a `Read` path outside the project and the plugin counts the same as a
+  tool beyond Read, Grep, Glob, and LS. Reads inside the working directory need no
+  pre-approval, so the key is gone. `jq` and `cat` are shell, so they prompt.
+  `db` creates missing folders for every `--out` / `-o` path as of `diffbot` 3.1.1
+  (before that only `db dql export --out` did), so skills never need `mkdir`.
+  `db dql init` still clears the old home-directory scratch folder, which no skill
+  uses any more.
 - **Never pre-approve a shell, interpreter, or package manager.** `python3 -m venv`,
   `pip install`, and `pip uninstall` were in the allowlist through v1.2.0 and are the
   reason Anthropic's directory held it (`ALLOWED_TOOLS_BROAD`, 10 findings, plus 3

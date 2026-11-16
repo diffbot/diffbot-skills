@@ -33,14 +33,14 @@ Adds the **diffbot** plugin: ten skills for Diffbot's structured web knowledge A
 - [x] No reading/exfiltration of secrets, tokens, `.env`, or env vars.
 - [x] Hooks and MCP scope are least-privilege — the plugin has no hooks and no MCP servers.
 - Network endpoints this plugin calls (and why):
-  - `pypi.org` / `files.pythonhosted.org` — the user runs one documented line to create `~/.diffbot/venv` and `pip install` [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.1.0, formerly `diffbot-python`), the `db` CLI every skill shells out to. The skills never install it themselves. Source: https://github.com/diffbot/diffbot-python.
+  - `pypi.org` / `files.pythonhosted.org` — the user runs one documented line to create `~/.diffbot/venv` and `pip install` [`diffbot`](https://pypi.org/project/diffbot/) (>= 3.1.1, formerly `diffbot-python`), the `db` CLI every skill shells out to. The skills never install it themselves. Source: https://github.com/diffbot/diffbot-python.
   - `kg.diffbot.com` — Knowledge Graph: DQL queries (`/kg/v3/dql`) and the ontology (`/kg/ontology`).
   - `api.diffbot.com` — Extract (`/v3/*`) and Crawl (`/v3/crawl`).
   - `llm.diffbot.com` — web search (`/api/v1/web_search`).
   - `nl.diffbot.com` — entity recognition and linking (`/v1/`).
 - Credentials/permissions it requires (and why):
   - A Diffbot API token, read from `DIFFBOT_API_TOKEN` or `~/.diffbot/credentials`. The user writes that file; the skills never write credentials and are instructed never to echo the token. Free tier at https://app.diffbot.com/get-started/.
-  - As of 1.2.2 each SKILL.md's allowlist is Read-only. Nine skills pre-approve `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no `allowed-tools` key. `db` (always invoked at `~/.diffbot/venv/bin/db`) and `jq` prompt the user. No `Bash`, and no shell, interpreter, or package manager: `python3 -m venv`, `pip install`, and `pip uninstall` are not pre-approved. The Anthropic directory accepts tools beyond Read, Grep, Glob, and LS only from Verified orgs; Diffbot is not one.
+  - As of 1.2.3 no SKILL.md has an `allowed-tools` key, so nothing is pre-approved. Exports are saved to `.diffbot/tmp/` in the working directory. `db` (always invoked at `~/.diffbot/venv/bin/db`) and `jq` prompt the user. No `Bash`, and no shell, interpreter, or package manager: `python3 -m venv`, `pip install`, and `pip uninstall` are not pre-approved. The Anthropic directory accepts tools beyond Read, Grep, Glob, and LS only from Verified orgs; Diffbot is not one.
 
 ## Notes for reviewers
 

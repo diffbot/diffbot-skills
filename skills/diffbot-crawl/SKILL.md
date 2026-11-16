@@ -1,7 +1,6 @@
 ---
 name: diffbot-crawl
 description: "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a task needs to discover a catalog of pages from an entire site, or deep search a site for structured data (e.g. all product inventory, all press releases, PDFs). Crawls run on Diffbot's servers; the CLI streams each page as it is processed and can list or delete jobs. Triggers on: crawl website, crawl site, crawler job, list crawl jobs, delete crawl job, diffbot crawl, every page on, all pages of, whole site."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Crawler
@@ -51,16 +50,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them. Always tell the user where an export was saved.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 
@@ -85,7 +84,7 @@ Deep crawl of a documentation site, saving to JSON:
   --max-to-process 500 \
   --restrict-domain \
   -f json \
-  -o ~/.diffbot/tmp/crawl_results.json
+  -o .diffbot/tmp/crawl_results.json
 ```
 
 Crawl only blog posts (by URL pattern):

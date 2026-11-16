@@ -7,3 +7,5 @@ dist/
 # Cowork bundling tooling and its vendored deps live on the `cowork` branch.
 # Ignored here so a rebase or stray build never reintroduces them to main.
 vendor/
+# Skill exports written while testing in this repo.
+.diffbot/

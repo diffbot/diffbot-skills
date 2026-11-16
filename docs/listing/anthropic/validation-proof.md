@@ -65,7 +65,7 @@ All eight subcommands the skills rely on are present:
 
 Each of the five new skills was exercised over its full documented path —
 `probe` for selectivity, then `export --spec` to CSV — confirming
-ontology cache → parallel probe → export to `~/.diffbot/tmp/` → formatted output,
+ontology cache → parallel probe → export to the scratch directory → formatted output,
 with no repeated permission prompts.
 
 Every DQL string shipped in the five new SKILL.md files was executed against the
@@ -99,7 +99,7 @@ observation, not assumption:
 
 ## Dependency floor
 
-The install line in the README pins `diffbot>=3.1.0` (at the time of this
+The install line in the README pins `diffbot>=3.1.1` (at the time of this
 capture, `diffbot-python>=0.2.1`; the package has since been renamed) rather than
 the bare package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
 when *any* version is already present, so a venv created against 0.1.0 would never
@@ -114,13 +114,10 @@ As of 1.2.2 the directory accepts `allowed-tools` beyond `Read`, `Grep`, `Glob`,
 from every allowlist. The user is prompted for `db` and `jq`. Skills still invoke `db`
 at `~/.diffbot/venv/bin/db`.
 
-Nine skills pre-approve only:
-
-```
-Read(~/.diffbot/tmp/**)    # all but web-search: read-only, scratch dir only
-```
-
-`diffbot-web-search` has no `allowed-tools` key.
+As of 1.2.3 no skill has an `allowed-tools` key. Through 1.2.2 nine skills pre-approved
+`Read` on a scratch folder under `~/.diffbot`; the directory refused that path as
+outside the project and the plugin. Exports now go to `.diffbot/tmp/` in the working
+directory.
 
 **1.2.1 history.** That release pre-authorized one `db` subcommand per entry at the
 fixed path, plus `jq:*` on `dql`, `news`, `people`, and `deals`:
@@ -137,7 +134,7 @@ Bash(~/.diffbot/venv/bin/db entities:*)           # entities
 Bash(~/.diffbot/venv/bin/db crawl:*)              # crawl
 Bash(~/.diffbot/venv/bin/db crawl-list-jobs:*)    # crawl
 Bash(jq:*)                                        # dql, news, people, deals
-Read(~/.diffbot/tmp/**)                           # all but web-search
+Read(<scratch folder under ~/.diffbot>)           # all but web-search
 ```
 
 **Changed in 1.2.1** (relative to 1.2.0). Through 1.2.0 each skill also pre-authorized
@@ -150,12 +147,11 @@ shows the user the line to run. 1.2.2 then removed the remaining Bash and `jq` e
 `db crawl-delete-job` stays off the allowlist. Deleting a crawl job is irreversible, so
 each deletion prompts the user — as does every other `db` command.
 
-`Read(~/.diffbot/tmp/**)` lets a skill read back the files `db` writes to its scratch
-directory with the Read tool. `jq` and `cat` prompt. The rule grants no writes or
-deletes, and nothing else under `~/.diffbot` — `~/.diffbot/credentials` still needs
-approval, as does a `../` escape.
+Skills read exports back from `.diffbot/tmp/` in the working directory with the Read
+tool. `jq` and `cat` prompt. Nothing under `~/.diffbot` is pre-approved —
+`~/.diffbot/credentials` still needs approval.
 
-No Bash entries. No plugin `settings.json`. Credentials are user-managed at
+No `allowed-tools` entries. No plugin `settings.json`. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.
 
 ## Staying within directory policy (after 1.2.2)

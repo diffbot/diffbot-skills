@@ -1,7 +1,6 @@
 ---
 name: diffbot-organizations
 description: "Company and organization structured search over the Diffbot Knowledge Graph. Prefer for prospect lists, market maps, competitor sets, and firmographic facts on a market or a named company, plus similarTo lookalike lists. Filter by industry, location, headcount, revenue, founding date, public status, founder, investor, acquirer, or parent company. MUST USE skill when the answer is a list of companies or involves structured company data. Rows are companies, not deals. Triggers on: find companies, list companies, search companies, competitors of, companies like, startups in, firms, vendors of, suppliers of, customers of, market map, prospect list, companies by industry, look up."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Organization Search
@@ -27,16 +26,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
@@ -187,7 +186,7 @@ type:Organization similarTo(name:"OpenAI") location.country.name:"United States"
 
 ```
 ~/.diffbot/venv/bin/db dql export 'type:Organization location.city.name:"Berlin" facet:categories.name' \
-  --out ~/.diffbot/tmp/facet.json --format json --size 25
+  --out .diffbot/tmp/facet.json --format json --size 25
 ```
 
 Facets require `--size` ≥ 1 (`--size 0` errors), and `--size` sets the **number of buckets** returned, not rows.
@@ -210,7 +209,7 @@ Zero hits usually means a mistyped category — re-check with `ontology taxonomy
 CSV for direct display:
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/orgs.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/orgs.csv \
   --spec "name,Company;descriptors,Description;nbEmployees,Employees;revenue.value,Revenue;location.city.name,City;location.country.name,Country;homepageUri,Website;isPublic,Public" \
   --size 50
 ```
@@ -218,7 +217,7 @@ CSV for direct display:
 JSON when results feed further analysis:
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/orgs.json --format json --size 50
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/orgs.json --format json --size 50
 ```
 
 `--spec` renders only the **primary** value of list/composite fields — one investor, one location. Export JSON if the user needs full lists.

@@ -58,10 +58,9 @@ search.** No other marketplace plugin in the `development` category offers it.
 - The `db` CLI is a one-time **user** install into a dedicated venv at
   `~/.diffbot/venv` from PyPI (`diffbot`, formerly `diffbot-python`). No vendored code,
   and no skill installs, upgrades, or uninstalls anything.
-- **Minimal permissions (1.2.2):** the directory accepts tools beyond Read, Grep, Glob,
-  and LS only from Verified organizations, and Diffbot is not one. Nine skills
-  pre-approve only `Read(~/.diffbot/tmp/**)`; `diffbot-web-search` has no allowlist.
-  `db` and `jq` prompt. No shell, interpreter, or package manager is pre-approved —
+- **Minimal permissions (1.2.3):** the directory accepts tools beyond Read, Grep, Glob,
+  and LS only from Verified organizations, and Diffbot is not one. No skill has an
+  allowlist. `db` and `jq` prompt. No shell, interpreter, or package manager is pre-approved —
   `python3 -m venv`, `pip install`, and `pip uninstall` stay off the allowlist, and Bash
   is gone entirely. Credentials are user-managed at `~/.diffbot/credentials`, never in
   the repo.
@@ -72,7 +71,7 @@ search.** No other marketplace plugin in the `development` category offers it.
   maintainer docs, intentionally not shipped as plugin context).
 - All ten skills smoke-tested against PyPI `diffbot-python` 0.1.0.
 - The six Knowledge Graph skills each run a real query E2E — ontology cache,
-  parallel probe, export to `~/.diffbot/tmp/`, formatted results — with no
+  parallel probe, export to the scratch directory, formatted results — with no
   permission loops.
 - Every DQL string shipped in the five new SKILL.md files was executed against the
   live KG before being written; documented traps were verified by observation.

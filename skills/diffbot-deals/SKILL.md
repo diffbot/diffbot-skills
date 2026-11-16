@@ -1,7 +1,6 @@
 ---
 name: diffbot-deals
 description: "Funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by company, investor, acquirer, round series, amount, date, or the company's industry. MUST USE skill when the answer involves a list of investment deals: deal flow, a company's funding history, an investor's portfolio activity, M&A lists, or the largest deals in a period. Rows are investment deals. Triggers on: funding rounds, raised, Series A, venture funding, funding history, deal flow, deal size, investments in, acquisitions, M&A, acquired for, valuation round."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Deal Search
@@ -27,16 +26,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
@@ -138,7 +137,7 @@ instead of listing:
 
 ```
 ~/.diffbot/venv/bin/db dql export 'type:Investment investment.date>="2026-01-01" facet:investment.series' \
-  --out ~/.diffbot/tmp/facet.json --format json --size 12
+  --out .diffbot/tmp/facet.json --format json --size 12
 ```
 
 Returns buckets like `Seed 4568 · Grant 3796 · Series A 2061 · Debt Financing 2015 ·
@@ -170,7 +169,7 @@ Zero hits on an `investee.<something>` path almost always means the field doesn'
 Rounds:
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/deals.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/deals.csv \
   --spec "investee.name,Company;investment.series,Round;investment.amount.value,Amount;investment.amount.currency,Currency;investment.date.str,Date;investment.investors.name,Lead Investor" \
   --size 50
 ```
@@ -178,7 +177,7 @@ Rounds:
 Acquisitions:
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/acquisitions.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/acquisitions.csv \
   --spec "name,Target;acquiredBy.name,Acquirer;acquiredBy.amount.value,Amount;acquiredBy.date.str,Date;categories.name,Industry" \
   --size 50
 ```
@@ -186,8 +185,8 @@ Acquisitions:
 Export JSON when the full investor list matters — `--spec` renders only the **primary** value of a list field, so the CSV shows one investor even when a round had thirty:
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/deals.json --format json --size 50
-jq -r '.data[].entity | "\(.investment.date.str)\t\(.investee.name)\t\(.investment.series)\t\([.investment.investors[]?.name] | join(", "))"' ~/.diffbot/tmp/deals.json
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/deals.json --format json --size 50
+jq -r '.data[].entity | "\(.investment.date.str)\t\(.investee.name)\t\(.investment.series)\t\([.investment.investors[]?.name] | join(", "))"' .diffbot/tmp/deals.json
 ```
 
 **Display**

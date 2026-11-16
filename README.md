@@ -27,8 +27,8 @@ npx skills add diffbot/diffbot-skills -g --all
 npx skills add diffbot/diffbot-skills -g -a claude-code -a cursor -a pi -y
 
 # Pin a release tag (git ref via URL or #fragment — @name selects a skill, not a tag)
-npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.2.2
-npx skills add diffbot/diffbot-skills#v1.2.2
+npx skills add https://github.com/diffbot/diffbot-skills/tree/v1.2.3
+npx skills add diffbot/diffbot-skills#v1.2.3
 ```
 
 Supported agents include Claude Code, Cursor, GitHub Copilot, Codex, Pi, Factory (Droid), Snowflake Cortex Code, ForgeCode, Gemini CLI, OpenCode, and [many more](https://github.com/vercel-labs/skills#supported-agents). Discover packages at [skills.sh](https://skills.sh).
@@ -72,12 +72,12 @@ cortex plugin install diffbot/diffbot-skills
 Pin the release tag:
 
 ```bash
-cortex plugin install github:diffbot/diffbot-skills@v1.2.2
+cortex plugin install github:diffbot/diffbot-skills@v1.2.3
 ```
 
 #### Cortex Code Desktop
 
-Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.2.2` to pin the tag).
+Agent Settings → Plugins → Add from GitHub → `diffbot/diffbot-skills` (append `#v1.2.3` to pin the tag).
 
 ### Factory.ai (Droid)
 
@@ -129,7 +129,7 @@ echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~
 3. Install the `db` CLI once, into the virtualenv every skill reads:
 
 ```bash
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
    This is a one-time user install, the same as putting `gh` or `wrangler` on your machine.
@@ -141,12 +141,12 @@ python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1
 
 ### Upgrading the `db` CLI
 
-If a skill reports a version below 3.1.0, `db --version` fails with `No such option
+If a skill reports a version below 3.1.1, `db --version` fails with `No such option
 '--version'` (an old `diffbot-python` install), or `db` warns about the `diffbot-python`
 rename, upgrade in place:
 
 ```bash
-~/.diffbot/venv/bin/pip install -U 'diffbot>=3.1.0'
+~/.diffbot/venv/bin/pip install -U 'diffbot>=3.1.1'
 ```
 
 The package was renamed from `diffbot-python` to [`diffbot`](https://pypi.org/project/diffbot/)
@@ -156,7 +156,7 @@ install afterwards no-ops on the surviving dist-info:
 
 ```bash
 ~/.diffbot/venv/bin/pip uninstall -y diffbot-python
-~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.1.0'
+~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.1.1'
 ```
 
 ## Skills
@@ -296,19 +296,19 @@ This is structured knowledge querying — not page fetching, not generic web sea
 ## Requirements
 
 - **Python 3.10+** (used to create `~/.diffbot/venv`)
-- **`diffbot` >= 3.1.0** (formerly `diffbot-python`), installed once by you — see [Setup](#setup)
+- **`diffbot` >= 3.1.1** (formerly `diffbot-python`), installed once by you — see [Setup](#setup)
 - **Diffbot API token** (free tier available)
 - A supported agent (see Install)
 
 ## Permissions
 
-Nine skills pre-approve only `Read(~/.diffbot/tmp/**)`. `diffbot-web-search` has no
-allowlist. `db` and `jq` are not pre-approved — Claude asks before running them. No
-shell, interpreter, or package manager is pre-authorized: `python3 -m venv`, `pip
-install`, and `pip uninstall` stay off every allowlist, so dependency installs and
-upgrades are always yours to run or approve. The Anthropic plugin directory accepts
-tools beyond Read, Grep, Glob, and LS only from Verified organizations; Diffbot is
-not one, which is why Bash is absent (1.2.2). Credentials are user-managed at
+No skill pre-approves any tool: none has an `allowed-tools` list (1.2.3). Claude asks
+before running `db` and `jq`. Exports are saved to `.diffbot/tmp/` in the working
+directory. No shell, interpreter, or package manager is pre-authorized: `python3 -m
+venv`, `pip install`, and `pip uninstall` are never pre-approved, so dependency installs
+and upgrades are always yours to run or approve. The Anthropic plugin directory accepts
+tools beyond Read, Grep, Glob, and LS, or a `Read` path outside the project and the
+plugin, only from Verified organizations; Diffbot is not one. Credentials are user-managed at
 `~/.diffbot/credentials` and never stored in this repo.
 
 ## License

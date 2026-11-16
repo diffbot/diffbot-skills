@@ -1,7 +1,6 @@
 ---
 name: diffbot-places
 description: "Cities, counties, subregions, states, provinces, countries, and points of interest in the Diffbot Knowledge Graph by name, population, prominence, containing place, or proximity. MUST USE skill when the answer is a list of places or a fact about one (i.e. population), rather than recalling from memory. Triggers on: list cities, list countries, largest cities, biggest city in, population of, how many people live in, places in, cities near, states in, provinces, counties, regions, points of interest, landmarks."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Place Search
@@ -27,16 +26,16 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.
 
 `init` refreshes `~/.diffbot/ontology.json` and verifies a token (`DIFFBOT_API_TOKEN` env var, else `~/.diffbot/credentials`). If neither exists the user must run:
 
@@ -184,7 +183,7 @@ report a place as missing from the KG until the accented form has also returned 
 ### Step 5 — export and display
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/places.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/places.csv \
   --spec "name,Place;population,Population;location.region.name,Region;location.country.name,Country;importance,Importance" \
   --size 50
 ```
@@ -195,7 +194,7 @@ provenance — `population`, `location`, and `isPartOf` are all **absent**, even
 can filter on them. Ask for them explicitly:
 
 ```
-~/.diffbot/venv/bin/db dql export '<DQL> get:name,population,location,isPartOf' --out ~/.diffbot/tmp/places.json --format json --size 50
+~/.diffbot/venv/bin/db dql export '<DQL> get:name,population,location,isPartOf' --out .diffbot/tmp/places.json --format json --size 50
 ```
 
 `--spec` already does this for you, which is why the CSV above shows populations. Only

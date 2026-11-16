@@ -1,7 +1,6 @@
 ---
 name: diffbot-dql
 description: "Runs a raw DQL (Diffbot Query Language) query against the Diffbot Knowledge Graph. The general-purpose layer beneath the entity-specific Diffbot skills: use it for entity types and query shapes they do not cover, such as products, patents, job posts, facet aggregations, cross-entity queries, an id filter from entity resolution, or ontology lookups. Triggers on: dql, query knowledge graph, search diffbot, diffbot kg, ontology lookup, facet query, entity types, raw dql."
-allowed-tools: Read(~/.diffbot/tmp/**)
 ---
 
 # Diffbot Knowledge Graph Search (DQL)
@@ -47,18 +46,18 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
 ```
 
-If it prints a version below 3.1.0, fails with `No such option '--version'` (an old
+If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
 upgrade, or uninstall line yourself.
 
-Save output files under `~/.diffbot/tmp/`. `db` creates that folder itself, so don't `mkdir`
-it first. Reading files there with the Read tool is pre-approved. `jq`, `cat`, and `db` are not — Claude will ask before running them.
+Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
+it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.
 
-`init` refreshes `~/.diffbot/ontology.json`, resets `~/.diffbot/tmp/`, and verifies a token is available. The token is read from the `DIFFBOT_API_TOKEN` environment variable if set, otherwise from `~/.diffbot/credentials`. If neither is present the user must run:
+`init` refreshes `~/.diffbot/ontology.json` and verifies a token is available. The token is read from the `DIFFBOT_API_TOKEN` environment variable if set, otherwise from `~/.diffbot/credentials`. If neither is present the user must run:
 
 ```
 echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~/.diffbot/credentials
@@ -245,14 +244,14 @@ Output is a sorted text table of hit counts; add `--json` for machine-readable. 
 **JSON export** (use when results will be piped or analyzed further):
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.json --format json --size N
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/<filename>.json --format json --size N
 ```
 
 JSON payloads are easy to slice with `jq` before passing to other tools:
 
 ```bash
 # To get all the keys available to you in the DQL export
-  jq '[.data[0].entity | path(..)] | map(join(".")) | unique' ~/.diffbot/tmp/<filename>.json
+  jq '[.data[0].entity | path(..)] | map(join(".")) | unique' .diffbot/tmp/<filename>.json
 ```
 
 Refrain from reading `text` or `content` from type:Article DQL exports directly. `summary` may be more appropriate.
@@ -260,7 +259,7 @@ Refrain from reading `text` or `content` from type:Article DQL exports directly.
 **CSV export** (use when presenting a table directly to the user):
 
 ```
-~/.diffbot/venv/bin/db dql export "<DQL>" --out ~/.diffbot/tmp/<filename>.csv \
+~/.diffbot/venv/bin/db dql export "<DQL>" --out .diffbot/tmp/<filename>.csv \
   --spec "name,Name;nbEmployees,Employees;homepageUri,Website;location.city.name,City;location.region.name,State;isPublic,Public"
 ```
 
