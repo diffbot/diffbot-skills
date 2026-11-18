@@ -100,11 +100,12 @@ the index does not have, or for a page whose current state matters.
 | `-m`, `--max-tokens` | none | Caps total response tokens — trims from the bottom of the ranking |
 | `-f`, `--format` | `list` | Output format: `list` (rich terminal), `json` (raw API), `text` (plain/agent-friendly) |
 
-**Requires `diffbot` >= 3.1.1** (`-s` was added in 3.1.0; the package was formerly
+**Requires `diffbot` >= 3.4.0** (`-s` was added in 3.1.0; the package was formerly
 `diffbot-python`, whose final release 0.3.0 lacks it). The Step 1 check reports the
 installed version. If `-s` is rejected as an unknown option, or `db` prints a
-`FutureWarning` about the rename, the venv is older than 3.1.0 — point the user at
-**Upgrading the `db` CLI** in the plugin README and stop. Don't upgrade it yourself.
+`FutureWarning` about the rename, the venv is older than 3.1.0. Any install below
+3.4.0, including 3.1.x, has to be upgraded — point the user at **Upgrading the `db`
+CLI** in the plugin README and stop. Don't upgrade it yourself.
 
 `-m` is the other way to shrink a response, and it degrades sharply: measured on one
 query, 5000 → 10 results, 2000 → 5, 1000 → 1, and **200 → zero**. Below roughly 1000
@@ -126,13 +127,13 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0,<4'
 ```
 
-If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
+If it prints a version below 3.4.0 (including 3.1.x and 3.2.x — upgrade them), fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
-upgrade, or uninstall line yourself.
+upgrade, or uninstall line yourself. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST; 3.4.0 is the release these skills require.
 
 The token is read from `DIFFBOT_API_TOKEN` env var or `~/.diffbot/credentials`. If missing:
 

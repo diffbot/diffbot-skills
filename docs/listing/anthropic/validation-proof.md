@@ -99,13 +99,15 @@ observation, not assumption:
 
 ## Dependency floor
 
-The install line in the README pins `diffbot>=3.1.1` (at the time of this
-capture, `diffbot-python>=0.2.1`; the package has since been renamed) rather than
+The install line in the README pins a minimum (at the time of this
+capture, `diffbot-python>=0.2.1`, later `diffbot>=3.1.0`; the package has since been renamed) rather than
 the bare package name. This is deliberate: `pip install <pkg>` with no constraint is a no-op
 when *any* version is already present, so a venv created against 0.1.0 would never
 upgrade. 0.1.0 sent the wrong query parameter for web-search `-n`, silently returning
 10 results regardless — the version floor is what guarantees the documented flag
-behaves as described.
+behaves as described. As of plugin 1.3.0 the install and upgrade lines require
+`diffbot>=3.4.0,<4`. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST
+with a JSON body (token stays the `token` query parameter); users on 3.1.x must upgrade.
 
 ## Permissions summary
 
