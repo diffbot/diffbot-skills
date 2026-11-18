@@ -50,7 +50,7 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0rc0,<4'
 ```
 
 If it prints a version below 3.4.0 (including 3.1.x and 3.2.x — upgrade them), fails with `No such option '--version'` (an old

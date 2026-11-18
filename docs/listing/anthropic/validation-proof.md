@@ -106,7 +106,7 @@ when *any* version is already present, so a venv created against 0.1.0 would nev
 upgrade. 0.1.0 sent the wrong query parameter for web-search `-n`, silently returning
 10 results regardless — the version floor is what guarantees the documented flag
 behaves as described. As of plugin 1.3.0 the install and upgrade lines require
-`diffbot>=3.4.0`. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST
+`diffbot>=3.4.0rc0,<4`. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST
 with a JSON body (token stays the `token` query parameter); users on 3.1.x must upgrade.
 
 ## Permissions summary
