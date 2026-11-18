@@ -9,7 +9,7 @@ Query the Diffbot Knowledge Graph via the DQL API. Translate the user's plain-te
 
 ## The `db dql` CLI
 
-All work in this skill is driven by the `db` CLI from the [`diffbot`](https://github.com/diffbot/diffbot-python) library. It owns token loading, URL encoding, HTTP, ontology lookup, and parallel probing.
+All work in this skill is driven by the `db` CLI from the [`diffbot`](https://github.com/diffbot/diffbot-python) library. It owns token loading, the DQL HTTP call, ontology lookup, and parallel probing. DQL is `POST https://kg.diffbot.com/kg/v3/dql` with a JSON body (`query`, `size`, and any `from`, `format`, `filter`, `exportspec`, and other fields). The token stays the `token` query parameter; any other placement is rejected. GET still works as a low-level escape hatch, and the query is not put in the URL. Always use `~/.diffbot/venv/bin/db` — do not call the endpoint yourself.
 
 **The CLI lives in a dedicated virtualenv at `~/.diffbot/venv`, which the user installs once** — the skill does not assume `db` is on `PATH` or that any other venv exists, and it never installs the library itself. Step 1 checks that the CLI is there. **Always invoke with the fixed path `~/.diffbot/venv/bin/db`** — never bare `db` and never another venv's `db`, so no `PATH` assumption is made. `db` is not pre-approved; Claude will ask before each run. Throughout this document `db` is shorthand for `~/.diffbot/venv/bin/db`; expand it to the full path in every actual bash command.
 
@@ -46,13 +46,13 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0'
 ```
 
-If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
+If it prints a version below 3.4.0 (including 3.1.x and 3.2.x — upgrade them), fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
-upgrade, or uninstall line yourself.
+upgrade, or uninstall line yourself. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST; 3.4.0 is the release these skills require.
 
 Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
 it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.

@@ -33,13 +33,13 @@ fails with `No such file or directory`, stop and show the user this line to run 
 themselves (it is deliberately not pre-approved):
 
 ```
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0'
 ```
 
-If it prints a version below 3.1.1, fails with `No such option '--version'` (an old
+If it prints a version below 3.4.0 (including 3.1.x and 3.2.x — upgrade them), fails with `No such option '--version'` (an old
 `diffbot-python` install, which predates the flag), or warns about the `diffbot-python`
 rename, point the user at **Upgrading the `db` CLI** in the plugin README and stop. Never run an install,
-upgrade, or uninstall line yourself.
+upgrade, or uninstall line yourself. 3.1.0 added `--version` and the rename; 3.2.0 switched DQL to POST; 3.4.0 is the release these skills require.
 
 Save output files under `.diffbot/tmp/` in the working directory. `db` creates that folder itself, so don't `mkdir`
 it first. `db`, `jq`, and `cat` are not pre-approved — Claude will ask before running them.

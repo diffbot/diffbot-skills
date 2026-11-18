@@ -129,7 +129,7 @@ echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~
 3. Install the `db` CLI once, into the virtualenv every skill reads:
 
 ```bash
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1.1'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0'
 ```
 
    This is a one-time user install, the same as putting `gh` or `wrangler` on your machine.
@@ -141,13 +141,15 @@ python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.1
 
 ### Upgrading the `db` CLI
 
-If a skill reports a version below 3.1.1, `db --version` fails with `No such option
+These skills require `diffbot` >= 3.4.0. If a skill reports a lower version, `db --version` fails with `No such option
 '--version'` (an old `diffbot-python` install), or `db` warns about the `diffbot-python`
 rename, upgrade in place:
 
 ```bash
-~/.diffbot/venv/bin/pip install -U 'diffbot>=3.1.1'
+~/.diffbot/venv/bin/pip install -U 'diffbot>=3.4.0'
 ```
+
+3.1.0 added `--version` and the rename from `diffbot-python`. 3.2.0 switched DQL to `POST https://kg.diffbot.com/kg/v3/dql` with a JSON body (the token stays the `token` query parameter; GET remains a low-level escape hatch). 3.4.0 is the cumulative release to install. 3.1.x and 3.2.x are not new enough and must be upgraded. The CLI sends that request; do not call the endpoint yourself.
 
 The package was renamed from `diffbot-python` to [`diffbot`](https://pypi.org/project/diffbot/)
 at 3.0.0. If a leftover `diffbot-python` is still in the venv, remove it and reinstall — in
@@ -156,7 +158,7 @@ install afterwards no-ops on the surviving dist-info:
 
 ```bash
 ~/.diffbot/venv/bin/pip uninstall -y diffbot-python
-~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.1.1'
+~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.4.0'
 ```
 
 ## Skills
@@ -296,7 +298,7 @@ This is structured knowledge querying — not page fetching, not generic web sea
 ## Requirements
 
 - **Python 3.10+** (used to create `~/.diffbot/venv`)
-- **`diffbot` >= 3.1.1** (formerly `diffbot-python`), installed once by you — see [Setup](#setup)
+- **`diffbot` >= 3.4.0** (formerly `diffbot-python`), installed once by you — see [Setup](#setup). 3.1.x must be upgraded.
 - **Diffbot API token** (free tier available)
 - A supported agent (see Install)
 
