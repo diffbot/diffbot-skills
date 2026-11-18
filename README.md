@@ -129,7 +129,7 @@ echo "DIFFBOT_API_TOKEN=YOUR_TOKEN_HERE" > ~/.diffbot/credentials && chmod 600 ~
 3. Install the `db` CLI once, into the virtualenv every skill reads:
 
 ```bash
-python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0rc0,<4'
+python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4.0,<4'
 ```
 
    This is a one-time user install, the same as putting `gh` or `wrangler` on your machine.
@@ -141,12 +141,12 @@ python3 -m venv ~/.diffbot/venv && ~/.diffbot/venv/bin/pip install 'diffbot>=3.4
 
 ### Upgrading the `db` CLI
 
-These skills require `diffbot>=3.4.0rc0,<4` (the 3.4.0 release candidate) for this verification branch. The unison publish will raise the floor to `diffbot>=3.4.0`. If a skill reports a lower version, `db --version` fails with `No such option
+These skills require `diffbot>=3.4.0,<4`. If a skill reports a lower version, `db --version` fails with `No such option
 '--version'` (an old `diffbot-python` install), or `db` warns about the `diffbot-python`
 rename, upgrade in place:
 
 ```bash
-~/.diffbot/venv/bin/pip install -U 'diffbot>=3.4.0rc0,<4'
+~/.diffbot/venv/bin/pip install -U 'diffbot>=3.4.0,<4'
 ```
 
 3.1.0 added `--version` and the rename from `diffbot-python`. 3.2.0 switched DQL to `POST https://kg.diffbot.com/kg/v3/dql` with a JSON body (the token stays the `token` query parameter; GET remains a low-level escape hatch). 3.4.0 is the cumulative release to install. 3.1.x and 3.2.x are not new enough and must be upgraded. The CLI sends that request; do not call the endpoint yourself.
@@ -158,7 +158,7 @@ install afterwards no-ops on the surviving dist-info:
 
 ```bash
 ~/.diffbot/venv/bin/pip uninstall -y diffbot-python
-~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.4.0rc0,<4'
+~/.diffbot/venv/bin/pip install --force-reinstall --no-deps 'diffbot>=3.4.0,<4'
 ```
 
 ## Skills
