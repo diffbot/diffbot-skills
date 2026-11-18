@@ -1,0 +1,135 @@
+name: CI
+
+# Checks for the plugin itself. The repo ships no scripts (directory policy),
+# so every check lives inline here. No secrets are used: nothing calls the
+# Diffbot API.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  manifests:
+    name: Manifests and skills
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Plugin manifests parse and agree on one version
+        run: |
+          set -euo pipefail
+          for f in .claude-plugin/marketplace.json .claude-plugin/plugin.json \
+                   .cortex-plugin/plugin.json .factory-plugin/plugin.json \
+                   .grok-plugin/plugin.json .github/plugin/plugin.json \
+                   docs/listing/*/marketplace-entry.json; do
+            jq empty "$f" || { echo "::error file=$f::invalid JSON"; exit 1; }
+          done
+          want=$(jq -r .version .claude-plugin/plugin.json)
+          echo "plugin version ${want}"
+          for f in .cortex-plugin/plugin.json .factory-plugin/plugin.json \
+                   .grok-plugin/plugin.json .github/plugin/plugin.json; do
+            got=$(jq -r .version "$f")
+            if [ "$got" != "$want" ]; then
+              echo "::error file=$f::version ${got} does not match .claude-plugin/plugin.json ${want}"
+              exit 1
+            fi
+          done
+          if [ -f CHANGELOG.md ] && ! grep -Eq "^## \[?${want//./\\.}\]?" CHANGELOG.md; then
+            echo "::error file=CHANGELOG.md::no section for ${want}"
+            exit 1
+          fi
+
+      - name: SKILL.md frontmatter
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in skills/*/SKILL.md; do
+            dir=$(basename "$(dirname "$f")")
+            fm=$(awk 'NR==1 && $0!="---"{exit 1} NR>1 && $0=="---"{exit} NR>1{print}' "$f") || {
+              echo "::error file=$f::missing YAML frontmatter"; fail=1; continue; }
+            name=$(printf '%s\n' "$fm" | sed -n 's/^name:[[:space:]]*//p' | tr -d '"'"'")
+            desc=$(printf '%s\n' "$fm" | sed -n 's/^description:[[:space:]]*//p')
+            if [ "$name" != "$dir" ]; then
+              echo "::error file=$f::name '${name}' does not match directory '${dir}'"; fail=1
+            fi
+            if [ -z "$desc" ]; then
+              echo "::error file=$f::empty description"; fail=1
+            fi
+            # Since 1.2.3 nothing is pre-approved (Anthropic directory policy).
+            if printf '%s\n' "$fm" | grep -q '^allowed-tools:'; then
+              echo "::error file=$f::allowed-tools is not allowed (see docs/CLAUDE.md)"; fail=1
+            fi
+            echo "ok ${f}"
+          done
+          exit "$fail"
+
+  claude-validate:
+    name: claude plugin validate --strict
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @anthropic-ai/claude-code
+      - run: claude --version
+      - run: claude plugin validate --strict .
+
+  cli:
+    name: diffbot CLI install lines resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Every documented install line uses one specifier
+        id: spec
+        run: |
+          set -euo pipefail
+          specs=$(grep -rhoE "pip install( -U| --force-reinstall --no-deps)? '[^']+'" skills README.md \
+                  | grep -oE "'[^']+'" | tr -d "'" | sort -u)
+          echo "specifiers found:"; printf '  %s\n' $specs
+          count=$(printf '%s\n' "$specs" | grep -c .)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::expected one diffbot specifier across skills and README, found ${count}"
+            exit 1
+          fi
+          echo "spec=${specs}" >> "$GITHUB_OUTPUT"
+
+      - name: Install exactly as documented
+        run: |
+          set -euo pipefail
+          python3 -m venv ~/.diffbot/venv
+          ~/.diffbot/venv/bin/pip install --quiet '${{ steps.spec.outputs.spec }}'
+          ~/.diffbot/venv/bin/pip show diffbot | sed -n '1,2p'
+          ~/.diffbot/venv/bin/db --version
+
+      - name: Every db subcommand the skills call exists
+        run: |
+          set -euo pipefail
+          cmds=$(grep -rhoE "venv/bin/db [a-z][a-z-]*( [a-z][a-z-]*)?" skills README.md \
+                 | awk '{ if ($2 == "dql" && $3 != "") print $2" "$3; else print $2 }' | sort -u)
+          fail=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            if ~/.diffbot/venv/bin/db $c --help >/dev/null 2>&1; then
+              echo "ok db ${c}"
+            else
+              echo "::error::'db ${c} --help' failed; a skill calls a subcommand this CLI does not have"
+              fail=1
+            fi
+          done <<< "$cmds"
+          exit "$fail"
